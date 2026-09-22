@@ -1,6 +1,6 @@
 window.SaraViaConfig = {
   app: {
-    name: 'Sara Via',
+    name: 'Saravia',
     version: '1.0.0',
     defaultLanguage: 'en',
     supportedLanguages: ['en', 'ar', 'fr', 'tr'],
@@ -46,7 +46,7 @@ window.SaraViaConfig = {
     en: {
       languageName: 'English',
       common: {
-        appName: 'Sara Via',
+        appName: 'Saravia',
         login: 'Login',
         logout: 'Logout',
         search: 'Search',
@@ -75,7 +75,7 @@ window.SaraViaConfig = {
       },
       hero: {
         title: 'Luxury travel, intelligently orchestrated across the world.',
-        subtitle: 'Sara Via blends destination discovery, premium stays, multilingual service, and secure payments into one global journey.',
+        subtitle: 'Saravia blends destination discovery, premium stays, multilingual service, and secure payments into one global journey.',
         cta: 'Start your next journey',
         rotatingPrefix: 'Now spotlighting'
       },
@@ -113,15 +113,15 @@ window.SaraViaConfig = {
         paymentTitle: 'Stripe test checkout',
         paymentSubtitle: 'Use the card element below. Apple Pay or Google Pay appears when Stripe detects wallet availability.',
         protectedMessage: 'Checkout is protected. Sign in to continue.',
-        confirmed: 'Your booking has been reserved in Sara Via.'
+        confirmed: 'Your booking has been reserved in Saravia.'
       },
       concierge: {
         title: 'AI travel concierge',
         subtitle: 'Ask for destinations, luxury hotels, or travel mood recommendations and get structured guidance instantly.',
-        placeholder: 'Ask Sara Via about your next luxury trip...',
+        placeholder: 'Ask Saravia about your next luxury trip...',
         send: 'Send',
-        greeting: 'Welcome to Sara Via. I can curate destinations, stays, and premium travel ideas worldwide.',
-        typing: 'Sara Via is preparing tailored recommendations...',
+        greeting: 'Welcome to Saravia. I can curate destinations, stays, and premium travel ideas worldwide.',
+        typing: 'Saravia is preparing tailored recommendations...',
         sectionMatches: 'Best matches',
         sectionHotels: 'Luxury stays',
         sectionMoment: 'Travel moment',
@@ -132,7 +132,7 @@ window.SaraViaConfig = {
         subtitle: 'Sign in to protect bookings, payment flow, and concierge continuity.',
         email: 'Email address',
         password: 'Password',
-        submit: 'Access Sara Via',
+        submit: 'Access Saravia',
         helper: 'Use any valid email and a password with at least 6 characters.',
         signedIn: 'You are now signed in.',
         signedOut: 'You have been signed out.'
@@ -183,7 +183,7 @@ window.SaraViaConfig = {
     ar: {
       languageName: 'العربية',
       common: {
-        appName: 'Sara Via',
+        appName: 'Saravia',
         login: 'تسجيل الدخول',
         logout: 'تسجيل الخروج',
         search: 'بحث',
@@ -212,7 +212,7 @@ window.SaraViaConfig = {
       },
       hero: {
         title: 'سفر فاخر يُدار بذكاء على مستوى العالم.',
-        subtitle: 'Sara Via تجمع اكتشاف الوجهات، والإقامات الراقية، والخدمة متعددة اللغات، والدفع الآمن في تجربة واحدة متكاملة.',
+        subtitle: 'Saravia تجمع اكتشاف الوجهات، والإقامات الراقية، والخدمة متعددة اللغات، والدفع الآمن في تجربة واحدة متكاملة.',
         cta: 'ابدأ رحلتك القادمة',
         rotatingPrefix: 'الوجهة المميزة الآن'
       },
@@ -250,15 +250,15 @@ window.SaraViaConfig = {
         paymentTitle: 'الدفع عبر Stripe بوضع الاختبار',
         paymentSubtitle: 'استخدم نموذج البطاقة أدناه. ستظهر Apple Pay أو Google Pay إذا كانت متاحة على جهازك.',
         protectedMessage: 'الدفع محمي. سجّل الدخول للمتابعة.',
-        confirmed: 'تم حفظ حجزك داخل Sara Via.'
+        confirmed: 'تم حفظ حجزك داخل Saravia.'
       },
       concierge: {
         title: 'المساعد الذكي للسفر',
         subtitle: 'اسأل عن وجهات أو فنادق فاخرة أو أساليب سفر، وستحصل على توصيات منظمة فورًا.',
-        placeholder: 'اسأل Sara Via عن رحلتك الفاخرة القادمة...',
+        placeholder: 'اسأل Saravia عن رحلتك الفاخرة القادمة...',
         send: 'إرسال',
-        greeting: 'مرحبًا بك في Sara Via. أستطيع تنسيق وجهات وإقامات وأفكار سفر فاخرة حول العالم.',
-        typing: 'Sara Via تُحضّر توصيات مصممة لك...',
+        greeting: 'مرحبًا بك في Saravia. أستطيع تنسيق وجهات وإقامات وأفكار سفر فاخرة حول العالم.',
+        typing: 'Saravia تُحضّر توصيات مصممة لك...',
         sectionMatches: 'أفضل الترشيحات',
         sectionHotels: 'إقامات فاخرة',
         sectionMoment: 'أجواء الرحلة',
@@ -269,7 +269,7 @@ window.SaraViaConfig = {
         subtitle: 'سجّل الدخول لحماية الحجز والدفع واستمرارية المساعد الذكي.',
         email: 'البريد الإلكتروني',
         password: 'كلمة المرور',
-        submit: 'الدخول إلى Sara Via',
+        submit: 'الدخول إلى Saravia',
         helper: 'استخدم بريدًا صحيحًا وكلمة مرور لا تقل عن 6 أحرف.',
         signedIn: 'تم تسجيل الدخول بنجاح.',
         signedOut: 'تم تسجيل الخروج.'
@@ -320,7 +320,7 @@ window.SaraViaConfig = {
     fr: {
       languageName: 'Français',
       common: {
-        appName: 'Sara Via',
+        appName: 'Saravia',
         login: 'Connexion',
         logout: 'Déconnexion',
         search: 'Rechercher',
@@ -349,7 +349,7 @@ window.SaraViaConfig = {
       },
       hero: {
         title: 'Le voyage de luxe, intelligemment orchestré à l’échelle mondiale.',
-        subtitle: 'Sara Via réunit découverte de destinations, séjours premium, service multilingue et paiement sécurisé dans une seule expérience.',
+        subtitle: 'Saravia réunit découverte de destinations, séjours premium, service multilingue et paiement sécurisé dans une seule expérience.',
         cta: 'Commencer votre prochain voyage',
         rotatingPrefix: 'Destination mise en lumière'
       },
@@ -387,15 +387,15 @@ window.SaraViaConfig = {
         paymentTitle: 'Paiement Stripe en mode test',
         paymentSubtitle: 'Utilisez le formulaire carte ci-dessous. Apple Pay ou Google Pay s’affiche si disponible.',
         protectedMessage: 'Le paiement est protégé. Connectez-vous pour continuer.',
-        confirmed: 'Votre réservation a été enregistrée dans Sara Via.'
+        confirmed: 'Votre réservation a été enregistrée dans Saravia.'
       },
       concierge: {
         title: 'Concierge de voyage IA',
         subtitle: 'Demandez des destinations, hôtels de luxe ou inspirations et recevez une réponse structurée immédiatement.',
-        placeholder: 'Demandez à Sara Via votre prochain voyage de luxe...',
+        placeholder: 'Demandez à Saravia votre prochain voyage de luxe...',
         send: 'Envoyer',
-        greeting: 'Bienvenue chez Sara Via. Je peux organiser destinations, séjours et inspirations premium dans le monde entier.',
-        typing: 'Sara Via prépare des recommandations sur mesure...',
+        greeting: 'Bienvenue chez Saravia. Je peux organiser destinations, séjours et inspirations premium dans le monde entier.',
+        typing: 'Saravia prépare des recommandations sur mesure...',
         sectionMatches: 'Meilleures options',
         sectionHotels: 'Séjours de luxe',
         sectionMoment: 'Moment de voyage',
@@ -406,7 +406,7 @@ window.SaraViaConfig = {
         subtitle: 'Connectez-vous pour protéger réservations, paiement et continuité du concierge.',
         email: 'Adresse email',
         password: 'Mot de passe',
-        submit: 'Accéder à Sara Via',
+        submit: 'Accéder à Saravia',
         helper: 'Utilisez un email valide et un mot de passe d’au moins 6 caractères.',
         signedIn: 'Connexion réussie.',
         signedOut: 'Vous avez été déconnecté.'
@@ -457,7 +457,7 @@ window.SaraViaConfig = {
     tr: {
       languageName: 'Türkçe',
       common: {
-        appName: 'Sara Via',
+        appName: 'Saravia',
         login: 'Giriş yap',
         logout: 'Çıkış yap',
         search: 'Ara',
@@ -486,7 +486,7 @@ window.SaraViaConfig = {
       },
       hero: {
         title: 'Lüks seyahat, küresel ölçekte akıllıca yönetilir.',
-        subtitle: 'Sara Via; destinasyon keşfi, premium konaklama, çok dilli hizmet ve güvenli ödemeyi tek bir yolculukta buluşturur.',
+        subtitle: 'Saravia; destinasyon keşfi, premium konaklama, çok dilli hizmet ve güvenli ödemeyi tek bir yolculukta buluşturur.',
         cta: 'Bir sonraki yolculuğunu başlat',
         rotatingPrefix: 'Şu anda öne çıkan'
       },
@@ -524,15 +524,15 @@ window.SaraViaConfig = {
         paymentTitle: 'Stripe test ödeme akışı',
         paymentSubtitle: 'Aşağıdaki kart alanını kullanın. Uygunsa Apple Pay veya Google Pay görünür.',
         protectedMessage: 'Ödeme korumalıdır. Devam etmek için giriş yapın.',
-        confirmed: 'Rezervasyonunuz Sara Via içinde kaydedildi.'
+        confirmed: 'Rezervasyonunuz Saravia içinde kaydedildi.'
       },
       concierge: {
         title: 'Yapay zekâ seyahat concierge',
         subtitle: 'Destinasyon, lüks otel veya seyahat ruhu sorun; anında yapılandırılmış öneri alın.',
-        placeholder: 'Sara Via\'ya bir sonraki lüks seyahatinizi sorun...',
+        placeholder: 'Saravia\'ya bir sonraki lüks seyahatinizi sorun...',
         send: 'Gönder',
-        greeting: 'Sara Via\'ya hoş geldiniz. Dünya çapında destinasyon, konaklama ve premium seyahat fikirleri planlayabilirim.',
-        typing: 'Sara Via size özel önerileri hazırlıyor...',
+        greeting: 'Saravia\'ya hoş geldiniz. Dünya çapında destinasyon, konaklama ve premium seyahat fikirleri planlayabilirim.',
+        typing: 'Saravia size özel önerileri hazırlıyor...',
         sectionMatches: 'En iyi eşleşmeler',
         sectionHotels: 'Lüks konaklamalar',
         sectionMoment: 'Seyahat atmosferi',
@@ -543,7 +543,7 @@ window.SaraViaConfig = {
         subtitle: 'Rezervasyon, ödeme akışı ve concierge sürekliliğini korumak için giriş yapın.',
         email: 'E-posta adresi',
         password: 'Şifre',
-        submit: 'Sara Via\'ya eriş',
+        submit: 'Saravia\'ya eriş',
         helper: 'Geçerli bir e-posta ve en az 6 karakterli bir şifre kullanın.',
         signedIn: 'Giriş başarılı.',
         signedOut: 'Çıkış yapıldı.'
