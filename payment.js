@@ -1,63 +1,22 @@
-(() => {
-  const button = document.querySelector('#donateButton');
-  const label = document.querySelector('#buttonLabel');
-  const status = document.querySelector('#paymentStatus');
-  const statusText = document.querySelector('#statusText');
-  let auth;
-  let sessionVerified = false;
-  let pendingIncompletePayment;
-  const update = (message, type = '', busy = false) => { statusText.textContent = message; status.className = `status ${type}`.trim(); button.disabled = busy; label.textContent = busy ? 'Payment in progress…' : 'Donate 0.1 Pi'; };
-  async function post(path, body) {
-    const response = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${auth.accessToken}` }, body: JSON.stringify(body) });
-    const result = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(result.error || 'The payment service is unavailable.');
-    return result;
-  }
-  async function recover(payment) {
-    if (!payment?.identifier) return;
-    update('Restoring your unfinished payment…', '', true);
-    try {
-      if (payment.transaction?.txid && !payment.status?.developer_completed) {
-        await post('/.netlify/functions/pi-complete', { paymentId: payment.identifier, txid: payment.transaction.txid });
-        update('Your 0.1 Pi donation is complete. Thank you!', 'success');
-      } else if (!payment.status?.developer_approved) {
-        await post('/.netlify/functions/pi-cancel', { paymentId: payment.identifier });
-        update('Previous payment cleared. Ready to donate.');
-      } else update('Finish the pending payment in your Pi wallet.');
-    } catch (error) { update(error.message, 'error'); }
-  }
-  async function authenticate() {
-    if (!window.Pi) { update('Open this page in Pi Browser to donate.', 'error'); button.disabled = true; return; }
-    window.Pi.init({ version: '2.0', sandbox: false });
-    update('Connecting securely to Pi…', '', true);
-    try {
-      auth = await window.Pi.authenticate(['username', 'payments'], payment => {
-        if (sessionVerified) recover(payment);
-        else pendingIncompletePayment = payment;
-      });
-      const verifiedUser = await post('/.netlify/functions/pi-auth', {});
-      sessionVerified = true;
-      update(`Ready, @${verifiedUser.username}`);
-      if (pendingIncompletePayment) {
-        const payment = pendingIncompletePayment;
-        pendingIncompletePayment = undefined;
-        await recover(payment);
-      }
-    }
-    catch (error) { auth = undefined; sessionVerified = false; update(error.message || 'Pi authentication was not completed.', 'error'); }
-  }
-  async function donate() {
-    if (!auth) { await authenticate(); if (!auth) return; }
-    update('Confirm the payment in your Pi wallet…', '', true);
-    try {
-      await window.Pi.createPayment({ amount: 0.1, memo: 'Support Saravia travel services with a 0.1 Pi donation', metadata: { type: 'saravia_donation', version: 1 } }, {
-        onReadyForServerApproval: async paymentId => { update('Securely approving your donation…', '', true); await post('/.netlify/functions/pi-approve', { paymentId }); },
-        onReadyForServerCompletion: async (paymentId, txid) => { update('Confirming your donation on Pi Network…', '', true); await post('/.netlify/functions/pi-complete', { paymentId, txid }); update('Your 0.1 Pi donation is complete. Thank you!', 'success'); },
-        onCancel: paymentId => { post('/.netlify/functions/pi-cancel', { paymentId }).catch(() => {}); update('Payment cancelled. You can try again anytime.'); },
-        onError: error => update(error?.message || 'Payment could not be completed.', 'error'),
-      });
-    } catch (error) { update(error.message || 'Payment could not be started.', 'error'); }
-  }
-  button.addEventListener('click', donate);
-  authenticate();
-})();
+const SCOPES = ["username", "payments", "wallet_address"];
+const SUPPORT = { amount: 0.1, memo: "SARAVIA mainnet support", metadata: { type: "community_support", version: 1 } };
+let auth = null;
+let currentUser = null;
+let pendingIncompletePayment = null;
+const $ = id => document.getElementById(id);
+const els = { login: $("login"), logout: $("logout"), name: $("pioneer-name"), browser: $("browser-note"), support: $("support"), getPi: $("get-pi"), supporter: $("supporter"), user: $("d-user"), wallet: $("d-wallet"), claim: $("d-claim"), supportState: $("d-support"), status: $("status"), cancel: $("cancel-incomplete") };
+function setStatus(message, kind) { els.status.textContent = message || ""; els.status.dataset.kind = kind || ""; }
+function setBusy(button, busy, label) { if (busy) { button.dataset.label = button.textContent; button.textContent = label; } else if (button.dataset.label) button.textContent = button.dataset.label; button.disabled = busy; }
+function shortWallet(value) { return value ? value.slice(0, 8) + "…" + value.slice(-6) : "—"; }
+async function post(path, body) { const headers = { "Content-Type": "application/json" }; if (auth?.accessToken) headers.Authorization = "Bearer " + auth.accessToken; const response = await fetch("/.netlify/functions/" + path, { method: "POST", headers, body: JSON.stringify(body || {}) }); const result = await response.json().catch(() => ({})); if (!response.ok) { const error = new Error(result.error || "The Mainnet payment service is unavailable."); error.status = response.status; throw error; } return result; }
+function renderSession(session) { currentUser = session; els.name.textContent = session.username || "Pioneer"; els.user.textContent = session.username || "Pioneer"; els.wallet.textContent = shortWallet(session.wallet_address); els.claim.textContent = session.getPiEnabled ? (session.claimed ? "Already claimed" : "Available once") : "Unavailable"; els.getPi.disabled = !session.getPiEnabled || session.claimed; els.getPi.textContent = session.claimed ? "Already claimed" : session.getPiEnabled ? "Get 0.01 π ↗" : "Unavailable until enabled"; els.support.disabled = false; els.login.hidden = true; els.logout.hidden = false; }
+function showBrowserHint() { if (!window.Pi) els.browser.hidden = false; }
+async function recover(payment) { if (!payment?.identifier) return; pendingIncompletePayment = payment; els.cancel.hidden = false; const paymentId = payment.identifier; const txid = payment.transaction?.txid; try { if (txid && !payment.status?.developer_completed) { setStatus("Completing your unfinished Mainnet payment…"); await post("pi-complete", { paymentId, txid }); els.supporter.hidden = false; els.supportState.textContent = "Confirmed"; els.cancel.hidden = true; setStatus("Your unfinished support payment is complete.", "success"); } else if (!payment.status?.developer_approved && !payment.status?.cancelled) { setStatus("Cancelling an unfinished payment…"); await post("pi-cancel", { paymentId }); els.cancel.hidden = true; setStatus("Previous payment cancelled. No Pi was unlocked."); } else setStatus("Finish the pending payment in Pi Wallet or cancel it here."); } catch (error) { setStatus(error.message, "error"); } }
+async function onIncompletePaymentFound(payment) { pendingIncompletePayment = payment; if (auth) await recover(payment); }
+async function login() { if (!window.Pi) { showBrowserHint(); setStatus("Open SARAVIA in Pi Browser to sign in.", "error"); return; } setBusy(els.login, true, "Connecting…"); try { auth = await window.Pi.authenticate(SCOPES, onIncompletePaymentFound); const session = await post("pi-me", { accessToken: auth.accessToken }); renderSession(session); setStatus("Signed in as @" + session.username + ".", "success"); if (pendingIncompletePayment) { const payment = pendingIncompletePayment; pendingIncompletePayment = null; await recover(payment); } } catch (error) { auth = null; setStatus(error.message || "Pi sign-in failed.", "error"); } finally { if (!currentUser) setBusy(els.login, false); } }
+async function payApp(amount, memo, metadata) { if (!window.Pi || !auth) throw new Error("Sign in with Pi before sending a payment."); return window.Pi.createPayment({ amount, memo, metadata }, { onReadyForServerApproval: async paymentId => { setStatus("Approving the payment securely…"); await post("pi-approve", { paymentId }); }, onReadyForServerCompletion: async (paymentId, txid) => { setStatus("Confirming the payment on Pi Mainnet…"); await post("pi-complete", { paymentId, txid }); els.supporter.hidden = false; els.supportState.textContent = "Confirmed"; setStatus("Support payment completed. Thank you.", "success"); }, onCancel: async paymentId => { try { await post("pi-cancel", { paymentId }); } catch (error) { console.warn("Cancel acknowledgement failed", error); } setStatus("Payment cancelled. No Pi was unlocked."); }, onError: error => setStatus(error?.message || "Pi payment failed.", "error") }); }
+async function support() { setBusy(els.support, true, "Opening Pi Wallet…"); try { await payApp(SUPPORT.amount, SUPPORT.memo, SUPPORT.metadata); } catch (error) { setStatus(error.message, "error"); } finally { setBusy(els.support, false); } }
+async function getPi() { if (!auth || !currentUser?.getPiEnabled) return; setBusy(els.getPi, true, "Sending…"); try { const result = await post("pi-get-pi", { accessToken: auth.accessToken }); currentUser.claimed = true; els.claim.textContent = "Already claimed"; els.getPi.textContent = "Already claimed"; setStatus(result.recovered ? "Your pending welcome payment was recovered." : "0.01 π sent to your wallet.", "success"); } catch (error) { if (error.status === 409) { currentUser.claimed = true; els.claim.textContent = "Already claimed"; els.getPi.textContent = "Already claimed"; } setStatus(error.message, error.status === 409 ? "success" : "error"); } finally { els.getPi.disabled = Boolean(currentUser?.claimed) || !currentUser?.getPiEnabled; } }
+async function cancelIncomplete() { if (!pendingIncompletePayment?.identifier) return; setBusy(els.cancel, true, "Cancelling…"); try { await post("pi-cancel", { paymentId: pendingIncompletePayment.identifier }); pendingIncompletePayment = null; els.cancel.hidden = true; setStatus("Unfinished payment cancelled. No Pi was unlocked."); } catch (error) { setStatus(error.message, "error"); } finally { setBusy(els.cancel, false); } }
+function logout() { auth = null; currentUser = null; pendingIncompletePayment = null; els.name.textContent = "Not signed in"; els.user.textContent = "—"; els.wallet.textContent = "—"; els.claim.textContent = "Unavailable"; els.supportState.textContent = "Locked"; els.support.disabled = true; els.getPi.disabled = true; els.supporter.hidden = true; els.cancel.hidden = true; els.login.hidden = false; els.logout.hidden = true; setStatus("Signed out of SARAVIA. Pi permissions remain managed by Pi Network."); }
+els.login.addEventListener("click", login); els.logout.addEventListener("click", logout); els.support.addEventListener("click", support); els.getPi.addEventListener("click", getPi); els.cancel.addEventListener("click", cancelIncomplete); showBrowserHint();
