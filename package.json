@@ -1,0 +1,7 @@
+{
+  "name": "saravia-pi-donations",
+  "private": true,
+  "type": "module",
+  "dependencies": { "@netlify/database": "latest", "drizzle-orm": "beta" },
+  "devDependencies": { "drizzle-kit": "beta" }
+}

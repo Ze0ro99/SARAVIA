@@ -126,7 +126,7 @@ window.SaraViaPayments = (function (config, utils) {
         country: 'US',
         currency: 'usd',
         total: {
-          label: 'Sara Via Booking',
+          label: 'Saravia Booking',
           amount: Math.round(Number(options.amount || 0) * 100)
         },
         requestPayerName: true,

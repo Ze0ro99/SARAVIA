@@ -168,7 +168,7 @@
 
   function renderHero() {
     var slide = state.heroSlides[state.heroIndex] || {
-      title: 'Sara Via',
+      title: 'Saravia',
       image: api.buildImageUrl('luxury travel world', 1600, 900, 88),
       score: 97
     };
