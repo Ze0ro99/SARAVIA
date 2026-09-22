@@ -1,7 +1,14 @@
 {
-  "name": "saravia-pi-donations",
+  "name": "saravia-mainnet",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
-  "dependencies": { "@netlify/database": "latest", "drizzle-orm": "beta" },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "@netlify/blobs": "latest",
+    "@netlify/database": "latest",
+    "drizzle-orm": "beta",
+    "pi-backend": "latest"
+  },
   "devDependencies": { "drizzle-kit": "beta" }
 }
