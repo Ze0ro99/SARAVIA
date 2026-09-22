@@ -1,11 +1,13 @@
-import { authenticatedUser, failure, input, json, pi, savePayment, validId } from './_pi.mjs';
+import { authenticatedUser, failure, input, json, mainnetGuard, pi, savePayment, validId } from './_pi.mjs';
 export default async req => {
   try {
+    mainnetGuard();
     const { paymentId } = await input(req);
     if (!validId(paymentId)) return json({ error: 'Invalid payment identifier.' }, 400);
-    const [user, payment] = await Promise.all([authenticatedUser(req), pi(`/payments/${paymentId}`)]);
+    const [user, payment] = await Promise.all([authenticatedUser(req), pi('/payments/' + paymentId)]);
     if (payment.user_uid !== user.uid) return json({ error: 'Payment does not belong to this user.' }, 403);
-    if (!payment.status?.cancelled && !payment.status?.developer_completed) await pi(`/payments/${paymentId}/cancel`, { method: 'POST' });
+    if (payment.network !== 'Pi Network' || payment.metadata?.type !== 'community_support') return json({ error: 'Only SARAVIA Mainnet community payments can be cancelled here.' }, 422);
+    if (!payment.status?.cancelled && !payment.status?.developer_completed) await pi('/payments/' + paymentId + '/cancel', { method: 'POST' });
     await savePayment(payment, 'cancelled');
     return json({ success: true });
   } catch (error) { return failure(error); }
