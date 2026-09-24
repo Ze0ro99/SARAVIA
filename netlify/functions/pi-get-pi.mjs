@@ -1,4 +1,4 @@
-import { failure, getClaim, input, json, mainnetGuard, mainnetPiClient, saveClaim, authenticatedUser } from './_pi.mjs';
+import { authenticatedUser, env, failure, getClaim, input, json, mainnetGuard, mainnetPiClient, reserveClaim, saveClaim } from './_pi.mjs';
 
 async function finish(client, user, claim) {
   let txid = claim.txid || null;
@@ -18,21 +18,28 @@ async function finish(client, user, claim) {
 export default async req => {
   try {
     mainnetGuard(true);
-    if (process.env.PI_ENABLE_GET_PI !== 'true' && !(globalThis.Netlify?.env?.get && Netlify.env.get('PI_ENABLE_GET_PI') === 'true')) return json({ error: 'Get Pi is disabled until the Mainnet app wallet is funded.' }, 503);
+    if (env('PI_ENABLE_GET_PI') !== 'true') return json({ error: 'Get Pi is disabled until the Mainnet app wallet is funded.' }, 503);
     const { accessToken } = await input(req);
     const user = await authenticatedUser(req, accessToken);
-    const existing = await getClaim(user.uid);
+    const existing = await reserveClaim(user.uid);
     if (existing?.status === 'claimed') return json({ error: 'Already claimed', claimed: true }, 409);
+    if (existing && existing.status !== 'failed' && !existing.paymentId) return json({ error: 'A welcome payment is already being processed. Try again shortly.' }, 409);
     const client = await mainnetPiClient();
     if (existing?.paymentId && ['processing', 'submitted', 'pending'].includes(existing.status)) {
       const recovered = await finish(client, user, existing);
       return json({ success: true, recovered: true, claimed: true, ...recovered });
     }
-    await saveClaim(user.uid, { status: 'processing', amount: 0.01, memo: 'SARAVIA welcome bonus' });
-    const paymentId = await client.createPayment({ amount: 0.01, memo: 'SARAVIA welcome bonus', metadata: { type: 'welcome_bonus', once: true, network: 'mainnet' }, uid: user.uid });
-    await saveClaim(user.uid, { status: 'processing', paymentId, amount: 0.01, memo: 'SARAVIA welcome bonus' });
-    const result = await finish(client, user, { paymentId, status: 'processing' });
-    return json({ success: true, claimed: true, ...result });
+    if (existing?.status === 'failed') await saveClaim(user.uid, { status: 'processing', amount: 0.01, memo: 'SARAVIA welcome bonus' });
+    let paymentId;
+    try {
+      paymentId = await client.createPayment({ amount: 0.01, memo: 'SARAVIA welcome bonus', metadata: { type: 'welcome_bonus', once: true, network: 'mainnet' }, uid: user.uid });
+      await saveClaim(user.uid, { status: 'processing', paymentId, amount: 0.01, memo: 'SARAVIA welcome bonus' });
+      const result = await finish(client, user, { paymentId, status: 'processing' });
+      return json({ success: true, claimed: true, ...result });
+    } catch (error) {
+      if (!paymentId) await saveClaim(user.uid, { status: 'failed', amount: 0.01, memo: 'SARAVIA welcome bonus' });
+      throw error;
+    }
   } catch (error) { return failure(error); }
 };
 export const config = { path: '/.netlify/functions/pi-get-pi' };

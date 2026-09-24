@@ -50,6 +50,11 @@ export async function authenticatedUser(req, suppliedToken = '') {
 export async function saveUser(user) {
   await db.insert(piUsers).values({ uid: user.uid, username: user.username, walletAddress: user.wallet_address, network: 'mainnet', updatedAt: new Date() }).onConflictDoUpdate({ target: piUsers.uid, set: { username: user.username, walletAddress: user.wallet_address, updatedAt: new Date() } });
 }
+export async function reserveClaim(userUid) {
+  const inserted = await db.insert(piClaims).values({ userUid, status: 'processing', amount: String(WELCOME_AMOUNT), memo: WELCOME_MEMO }).onConflictDoNothing().returning({ userUid: piClaims.userUid });
+  if (inserted.length) return null;
+  return getClaim(userUid);
+}
 export async function getClaim(uid) {
   const rows = await db.select().from(piClaims).where(eq(piClaims.userUid, uid)).limit(1);
   return rows[0] || null;
