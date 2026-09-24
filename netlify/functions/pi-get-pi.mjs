@@ -1,4 +1,4 @@
-import { failure, getClaim, input, json, mainnetGuard, mainnetPiClient, saveClaim, authenticatedUser } from './_pi.mjs';
+import { authenticatedUser, env, failure, getClaim, input, json, mainnetGuard, mainnetPiClient, saveClaim } from './_pi.mjs';
 
 async function finish(client, user, claim) {
   let txid = claim.txid || null;
@@ -18,7 +18,7 @@ async function finish(client, user, claim) {
 export default async req => {
   try {
     mainnetGuard(true);
-    if (process.env.PI_ENABLE_GET_PI !== 'true' && !(globalThis.Netlify?.env?.get && Netlify.env.get('PI_ENABLE_GET_PI') === 'true')) return json({ error: 'Get Pi is disabled until the Mainnet app wallet is funded.' }, 503);
+    if (env('PI_ENABLE_GET_PI') !== 'true') return json({ error: 'Get Pi is disabled until the Mainnet app wallet is funded.' }, 503);
     const { accessToken } = await input(req);
     const user = await authenticatedUser(req, accessToken);
     const existing = await getClaim(user.uid);
