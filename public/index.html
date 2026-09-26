@@ -1,28 +1,51 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#17130f">
-  <meta name="description" content="SARAVIA Mainnet: tourism, travel, hotels, and logistics paid in Pi."><title>SARAVIA · Pi Mainnet</title>
-  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,560;9..144,680&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SARAVIA · Pi Mainnet</title>
   <link rel="stylesheet" href="./styles.css">
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-  <script>try { if (window.Pi) window.Pi.init({ version: "2.0", sandbox: false }); } catch (error) { console.warn("Pi.init failed", error); }</script>
+  <script>
+    try {
+      if (window.Pi) {
+        window.Pi.init({ version: "2.0", sandbox: false });
+      }
+    } catch (error) {
+      console.warn("Pi SDK init notice:", error);
+    }
+  </script>
 </head>
 <body>
-  <div class="mainnet-bar"><span class="signal"></span> PI MAINNET <span class="bar-note">Real Pi · payments are irreversible</span></div>
-  <main class="shell">
-    <header class="masthead"><div><p class="eyebrow">SARAVIA / FIELD DESK</p><p class="wordmark">SARAVIA</p></div><div class="identity"><span id="pioneer-name">Not signed in</span><button id="logout" class="text-button" type="button" hidden>Log out</button></div></header>
-    <section class="hero"><div class="hero-copy"><p class="eyebrow">Tourism · Travel · Hotels · Logistics</p><h1>Move well.<br><em>Pay simply.</em></h1><p class="lede">SARAVIA brings considered travel, hotel stays, destination planning, and dependable logistics together. This Mainnet desk accepts real Pi for community support and future bookings.</p><div class="notice">Only continue if you are in Pi Browser and have reviewed the amount and memo.</div></div><div class="hero-action"><div class="orb"><span>π</span></div><button id="login" class="button button-primary" type="button">Continue with Pi <span>↗</span></button><p id="browser-note" class="browser-note" hidden>Open SARAVIA in Pi Browser to sign in.</p></div></section>
-    <section class="cards" aria-label="Mainnet actions">
-      <article class="card support-card"><div class="card-top"><span class="index">01</span><span class="tag">COMMUNITY SUPPORT</span></div><h2>Support SARAVIA</h2><p>Send 0.1 π with the memo “SARAVIA mainnet support”. You sign the payment in Pi Wallet.</p><button id="support" class="button" type="button" disabled>Send 0.1 π support <span>↗</span></button><p id="supporter" class="success-mark" hidden>✓ Support payment confirmed</p></article>
-      <article class="card welcome-card"><div class="card-top"><span class="index">02</span><span class="tag">OPTIONAL · A2U</span></div><h2>Get Pi</h2><p>A one-time 0.01 π welcome bonus is available only when the funded Mainnet app wallet enables it.</p><button id="get-pi" class="button" type="button" disabled>Unavailable until enabled</button><p class="card-note">No public faucet. This is not a claim until the server confirms payment completion.</p></article>
+  <header>
+    <div class="badge">PI MAINNET ECOSYSTEM</div>
+    <h1>SARAVIA</h1>
+    <p class="subtitle">Global decentralized reservations powered exclusively by Pi Network Mainnet.</p>
+  </header>
+
+  <main>
+    <section class="cards" aria-label="Featured stays">
+      <article class="card">
+        <div class="card-top"><span class="index">02</span><span class="tag">DESKS</span></div>
+        <h2>Featured stays</h2>
+        <p>Choose a destination, sign in with Pi, and pay a 0.1 π booking deposit. No email, no cards, no external checkout.</p>
+      </article>
     </section>
-    <section class="session card"><div class="card-top"><span class="index">SESSION</span><span class="tag">VERIFIED BY PI</span></div><div class="session-grid"><div><span>Username</span><strong id="d-user">—</strong></div><div><span>Wallet</span><strong id="d-wallet">—</strong></div><div><span>Welcome</span><strong id="d-claim">Unavailable</strong></div><div><span>Support</span><strong id="d-support">Locked</strong></div></div></section>
-    <div class="notice-row"><p id="status" class="status" role="status" aria-live="polite"></p><button id="cancel-incomplete" class="text-button" type="button" hidden>Cancel unfinished payment</button></div>
-    <footer><span>SARAVIA MAINNET</span><span>Real Pi · Pi Browser only</span></footer>
+
+    <section id="booking-grid" class="cards" aria-label="Book a stay"></section>
+
+    <section class="session-box">
+      <h2>Pioneer Session</h2>
+      <p id="user-display">Sign in with your Pi Network account to proceed with bookings or support.</p>
+      <div style="margin-top: 1rem;">
+        <button id="auth-btn" class="button" type="button">Continue with Pi</button>
+        <button id="support-btn" class="button" type="button" style="display: none; background: #059669;">Send 0.1 π support</button>
+      </div>
+      <div id="status-box"></div>
+    </section>
   </main>
-  <script type="module" src="./app.js"></script>
+
+  <script src="./app.js"></script>
+  <script src="./booking.js"></script>
 </body>
 </html>
