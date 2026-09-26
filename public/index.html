@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SARAVIA · Pi Mainnet</title>
+  <title>SARAVIA · Pi Mainnet Luxury Travel, Aviation & Logistics</title>
   <link rel="stylesheet" href="./styles.css">
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
   <script>
@@ -11,39 +11,96 @@
       if (window.Pi) {
         window.Pi.init({ version: "2.0", sandbox: false });
       }
-    } catch (error) {
-      console.warn("Pi SDK init notice:", error);
+    } catch (e) {
+      console.warn("Pi SDK init status:", e);
     }
   </script>
 </head>
 <body>
-  <header>
-    <div class="badge">PI MAINNET ECOSYSTEM</div>
-    <h1>SARAVIA</h1>
-    <p class="subtitle">Global decentralized reservations powered exclusively by Pi Network Mainnet.</p>
-  </header>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="brand-badge">Official Pi Network Mainnet Application</div>
+      <h1>SARAVIA <span>GLOBAL</span></h1>
+      <p class="tagline">Decentralized luxury travel, private aviation, executive stays, and secure cargo logistics powered entirely by Pi.</p>
+    </header>
 
-  <main>
-    <section class="cards" aria-label="Featured stays">
-      <article class="card">
-        <div class="card-top"><span class="index">02</span><span class="tag">DESKS</span></div>
-        <h2>Featured stays</h2>
-        <p>Choose a destination, sign in with Pi, and pay a 0.1 π booking deposit. No email, no cards, no external checkout.</p>
-      </article>
-    </section>
-
-    <section id="booking-grid" class="cards" aria-label="Book a stay"></section>
-
-    <section class="session-box">
-      <h2>Pioneer Session</h2>
-      <p id="user-display">Sign in with your Pi Network account to proceed with bookings or support.</p>
-      <div style="margin-top: 1rem;">
-        <button id="auth-btn" class="button" type="button">Continue with Pi</button>
-        <button id="support-btn" class="button" type="button" style="display: none; background: #059669;">Send 0.1 π support</button>
+    <!-- Pioneer Authentication & Support Panel -->
+    <section class="session-panel">
+      <div class="session-info" id="session-text">
+        Connect your Pi account to access VIP reservations, flights, and logistics.
       </div>
-      <div id="status-box"></div>
+      <div class="button-group">
+        <button id="btn-login" class="btn" type="button">Connect with Pi</button>
+        <button id="btn-support" class="btn" type="button" style="display: none;">Send 0.1 π Support</button>
+        <button id="btn-open-partner-modal" class="btn btn-secondary" type="button">+ List Your Service</button>
+      </div>
     </section>
-  </main>
+
+    <!-- Category Tabs -->
+    <nav class="tabs-container">
+      <button class="tab-btn active" data-filter="all">All Services</button>
+      <button class="tab-btn" data-filter="stays">🏨 Hotels & Resorts</button>
+      <button class="tab-btn" data-filter="flights">✈️ Aviation & Flights</button>
+      <button class="tab-btn" data-filter="logistics">🚚 Logistics & VIP Fleet</button>
+    </nav>
+
+    <!-- Dynamic Services Catalog -->
+    <main>
+      <section id="services-catalog" class="service-grid"></section>
+    </main>
+
+    <!-- Partner Merchant Section -->
+    <section class="partner-section">
+      <h2>Partner with SARAVIA Ecosystem</h2>
+      <p>Are you a hotel operator, airline charter, private jet broker, or logistics enterprise? Offer your services to millions of verified Pioneers worldwide.</p>
+      <button class="btn btn-purple" onclick="document.getElementById('partner-modal').style.display='flex'">
+        Submit Merchant Listing
+      </button>
+    </section>
+  </div>
+
+  <!-- Partner Listing Modal -->
+  <div id="partner-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>List Your Service</h3>
+        <button id="btn-close-modal" class="close-modal">&times;</button>
+      </div>
+      <form id="partner-form">
+        <div class="form-group">
+          <label for="p-category">Service Category</label>
+          <select id="p-category" class="form-control" required>
+            <option value="stays">Hotel / Luxury Stay</option>
+            <option value="flights">Aviation / Airline Flight</option>
+            <option value="logistics">Logistics / VIP Transport</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="p-title">Business / Service Name</label>
+          <input type="text" id="p-title" class="form-control" placeholder="e.g. Skyline Private Charters" required>
+        </div>
+        <div class="form-group">
+          <label for="p-location">Location / Coverage Area</label>
+          <input type="text" id="p-location" class="form-control" placeholder="e.g. Zurich - New York" required>
+        </div>
+        <div class="form-group">
+          <label for="p-deposit">Booking Deposit (π)</label>
+          <input type="number" step="0.01" min="0.01" id="p-deposit" class="form-control" value="0.1" required>
+        </div>
+        <div class="form-group">
+          <label for="p-desc">Service Description</label>
+          <textarea id="p-desc" class="form-control" rows="3" placeholder="Describe the luxury service, vehicle/room specifications..." required></textarea>
+        </div>
+        <button type="submit" class="btn" style="width: 100%; justify-content: center; margin-top: 0.5rem;">
+          Publish Listing Instantly
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="status-toast"></div>
 
   <script src="./app.js"></script>
   <script src="./booking.js"></script>
