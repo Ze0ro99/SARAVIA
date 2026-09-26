@@ -1,6 +1,6 @@
 # SARAVIA Mainnet
 
-The main branch is the production Mainnet build for SARAVIA. It is isolated from the Testnet build at https://saravia1.netlify.app.
+The main branch is the production Mainnet build for SARAVIA. It is isolated from the Testnet build at https://saraviaa.netlify.app.
 
 Read MAINNET_GUIDE.md before configuring the separate saravia-mainnet Netlify site. Mainnet uses a new Pi Developer Portal app, URL, API key, confirmed wallet, and sandbox: false. Real Pi payments are irreversible.
 
