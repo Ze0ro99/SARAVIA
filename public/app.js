@@ -1,110 +1,130 @@
 const SCOPES = ["username", "payments", "wallet_address"];
-let currentUser = null;
+let activePioneer = null;
 
-function setStatus(message, type = "info") {
-  const box = document.getElementById("status-box");
-  if (!box) return;
-  box.textContent = message;
-  box.className = "";
-  box.classList.add(`status-${type}`);
-  box.style.display = "block";
+function showToast(message, type = "info") {
+  const toast = document.getElementById("status-toast");
+  if (!toast) return;
+  toast.textContent = message;
+  toast.className = `toast-${type}`;
+  toast.style.display = "block";
+
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => {
+    toast.style.display = "none";
+  }, 5000);
 }
 
-async function signInWithPi() {
+async function authenticatePioneer() {
   try {
     if (!window.Pi) {
-      throw new Error("Pi SDK is not loaded. Please open inside Pi Browser.");
+      throw new Error("Pi SDK is loading or not available. Please open inside Pi Browser.");
     }
-    setStatus("Connecting with Pi Network...", "info");
-    const authResult = await window.Pi.authenticate(SCOPES, onIncompletePaymentFound);
-    currentUser = authResult.user;
-    
-    document.getElementById("user-display").textContent = "Pioneer: @" + currentUser.username;
-    document.getElementById("auth-btn").style.display = "none";
-    document.getElementById("support-btn").style.display = "inline-block";
-    
-    setStatus("Authenticated successfully as @" + currentUser.username, "success");
+    showToast("Connecting to Pi Mainnet...", "info");
+    const authResult = await window.Pi.authenticate(SCOPES, onIncompletePayment);
+    activePioneer = authResult.user;
+
+    const sessionInfo = document.getElementById("session-text");
+    if (sessionInfo) {
+      sessionInfo.innerHTML = `Welcome, <strong>@${activePioneer.username}</strong> · Pi Mainnet Connected`;
+    }
+
+    document.getElementById("btn-login").style.display = "none";
+    document.getElementById("btn-support").style.display = "inline-flex";
+
+    showToast(`Authenticated as @${activePioneer.username}`, "success");
   } catch (err) {
     console.error("Authentication error:", err);
-    setStatus(err.message || "Failed to authenticate with Pi", "error");
+    showToast(err.message || "Pi authentication failed.", "error");
   }
 }
 
-async function payApp(amount, memo, metadata = {}) {
+async function payWithPi(amount, memo, metadata = {}) {
   try {
     if (!window.Pi) {
-      throw new Error("Pi SDK unavailable. Use Pi Browser.");
+      throw new Error("Please open this app inside Pi Browser.");
     }
-    setStatus("Requesting transaction for " + amount + " π...", "info");
-    
+
+    showToast(`Initiating transaction for ${amount} π...`, "info");
+
     const paymentData = {
       amount: amount,
       memo: memo,
       metadata: metadata
     };
 
-    const paymentCallbacks = {
+    const callbacks = {
       onReadyForServerApproval: function (paymentId) {
-        setStatus("Payment awaiting approval: " + paymentId, "info");
+        showToast(`Payment registered (${paymentId.substring(0, 8)}...). Awaiting server sign...`, "info");
         fetch("/.netlify/functions/approve", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ paymentId: paymentId })
-        }).catch(err => console.warn("Approval notification sent:", err));
+        }).catch(err => console.warn("Approval webhook error:", err));
       },
       onReadyForServerCompletion: function (paymentId, txid) {
-        setStatus("Completing payment with TxID: " + txid.substring(0, 10) + "...", "info");
+        showToast("Broadcasting transaction to Pi Mainnet...", "info");
         fetch("/.netlify/functions/complete", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ paymentId: paymentId, txid: txid })
         }).then(() => {
-          setStatus("Payment of " + amount + " π completed successfully!", "success");
+          showToast(`Transaction of ${amount} π confirmed on Pi Ledger!`, "success");
         }).catch(() => {
-          setStatus("Payment broadcasted on Pi Ledger: " + txid, "success");
+          showToast(`Transaction broadcasted: ${txid.substring(0, 12)}...`, "success");
         });
       },
       onCancel: function (paymentId) {
-        setStatus("Payment was cancelled by Pioneer.", "error");
+        showToast("Payment was cancelled by Pioneer.", "error");
       },
       onError: function (error, payment) {
         console.error("Payment error:", error);
-        setStatus("Payment failed: " + (error.message || "Unknown error"), "error");
+        showToast(error.message || "Payment encounter an issue.", "error");
       }
     };
 
-    await window.Pi.createPayment(paymentData, paymentCallbacks);
+    await window.Pi.createPayment(paymentData, callbacks);
   } catch (err) {
-    console.error("Payment invocation error:", err);
-    setStatus(err.message || "Payment initiation failed", "error");
+    console.error("Payment error:", err);
+    showToast(err.message || "Transaction failed to initiate.", "error");
     throw err;
   }
 }
 
-function onIncompletePaymentFound(payment) {
-  console.log("Incomplete payment discovered:", payment);
+function onIncompletePayment(payment) {
+  console.log("Incomplete payment detected:", payment);
   fetch("/.netlify/functions/incomplete", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ payment: payment })
-  }).catch(e => console.error("Incomplete handling notice:", e));
+  }).catch(err => console.warn(err));
 }
 
-// Global exposure for booking & support
-window.saraviaPay = payApp;
-window.saraviaStatus = setStatus;
+// Global exposure
+window.saraviaPay = payWithPi;
+window.saraviaToast = showToast;
 
-document.addEventListener("DOMContentLoaded", function () {
-  const authBtn = document.getElementById("auth-btn");
-  const supportBtn = document.getElementById("support-btn");
+document.addEventListener("DOMContentLoaded", () => {
+  const loginBtn = document.getElementById("btn-login");
+  const supportBtn = document.getElementById("btn-support");
+  const partnerModal = document.getElementById("partner-modal");
+  const openModalBtn = document.getElementById("btn-open-partner-modal");
+  const closeModalBtn = document.getElementById("btn-close-modal");
 
-  if (authBtn) {
-    authBtn.addEventListener("click", signInWithPi);
-  }
-
+  if (loginBtn) loginBtn.addEventListener("click", authenticatePioneer);
   if (supportBtn) {
-    supportBtn.addEventListener("click", function () {
-      payApp(0.1, "SARAVIA mainnet support", { type: "support" });
+    supportBtn.addEventListener("click", () => {
+      payWithPi(0.1, "SARAVIA mainnet support", { type: "support" });
     });
   }
+
+  // Modal Controls
+  if (openModalBtn && partnerModal) {
+    openModalBtn.addEventListener("click", () => partnerModal.style.display = "flex");
+  }
+  if (closeModalBtn && partnerModal) {
+    closeModalBtn.addEventListener("click", () => partnerModal.style.display = "none");
+  }
+  window.addEventListener("click", (e) => {
+    if (e.target === partnerModal) partnerModal.style.display = "none";
+  });
 });
