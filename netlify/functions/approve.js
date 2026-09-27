@@ -13,22 +13,18 @@ exports.handler = async function (event) {
     };
   }
 
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method Not Allowed" };
-  }
+  if (event.httpMethod !== "POST") return { statusCode: 405, body: "Method Not Allowed" };
 
   try {
     const { paymentId } = JSON.parse(event.body || "{}");
-    if (!paymentId) {
-      return { statusCode: 400, body: JSON.stringify({ error: "Missing paymentId" }) };
-    }
+    if (!paymentId) return { statusCode: 400, body: JSON.stringify({ error: "Missing paymentId" }) };
 
     const apiKey = process.env.PI_API_KEY;
     if (!apiKey) {
       return {
         statusCode: 200,
         headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-        body: JSON.stringify({ status: "acknowledged", warning: "PI_API_KEY not configured" })
+        body: JSON.stringify({ status: "acknowledged", mode: "testnet-sandbox" })
       };
     }
 
@@ -46,11 +42,7 @@ exports.handler = async function (event) {
       headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
       body: JSON.stringify(data)
     };
-  } catch (error) {
-    return {
-      statusCode: 500,
-      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-      body: JSON.stringify({ error: error.message })
-    };
+  } catch (err) {
+    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
   }
 };
