@@ -227,3 +227,50 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target === diagModal) diagModal.style.display = "none";
   });
 });
+
+// Multi-Resolution High-Fidelity PNG Exporter Engine
+function exportLogoAsPNG(targetDimension) {
+  showToast(`Rendering ${targetDimension}x${targetDimension} HD PNG...`, "info");
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  img.onload = function () {
+    const canvas = document.createElement("canvas");
+    canvas.width = targetDimension;
+    canvas.height = targetDimension;
+    const ctx = canvas.getContext("2d");
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(img, 0, 0, targetDimension, targetDimension);
+    const a = document.createElement("a");
+    a.download = `SARAVIA-Emblem-${targetDimension}x${targetDimension}.png`;
+    a.href = canvas.toDataURL("image/png");
+    a.click();
+    showToast(`${targetDimension}x${targetDimension} PNG exported successfully!`, "success");
+  };
+  img.onerror = function () {
+    showToast("Error generating PNG from vector.", "error");
+  };
+  img.src = "./assets/logo-1024.svg";
+}
+
+window.saraviaExportPNG = exportLogoAsPNG;
+window.saraviaOpenBrandStudio = function () {
+  const modal = document.getElementById("brand-modal");
+  if (modal) modal.style.display = "flex";
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  const brandBtn = document.getElementById("btn-open-brand");
+  const brandModal = document.getElementById("brand-modal");
+  const closeBrandBtn = document.getElementById("btn-close-brand");
+
+  if (brandBtn && brandModal) {
+    brandBtn.addEventListener("click", () => brandModal.style.display = "flex");
+  }
+  if (closeBrandBtn && brandModal) {
+    closeBrandBtn.addEventListener("click", () => brandModal.style.display = "none");
+  }
+  window.addEventListener("click", (e) => {
+    if (e.target === brandModal) brandModal.style.display = "none";
+  });
+});

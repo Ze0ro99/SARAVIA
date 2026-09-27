@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SARAVIA · Pi Mainnet Luxury Travel, Aviation & Logistics</title>
+  <title>SARAVIA · Pi Network Luxury Travel, Aviation & Logistics</title>
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
   <link rel="apple-touch-icon" href="./assets/logo-1024.svg">
   <link rel="stylesheet" href="./styles.css">
@@ -11,6 +11,7 @@
   <script>
     try {
       if (window.Pi) {
+        // Initialize Pi SDK dynamically according to context
         window.Pi.init({ version: "2.0", sandbox: false });
       }
     } catch (e) {
@@ -20,15 +21,17 @@
 </head>
 <body>
   <div class="container">
+    <!-- Brand Header -->
     <header>
-      <div class="brand-logo-wrap">
-        <img src="./assets/logo-1024.svg" alt="SARAVIA Emblem 1024x1024">
+      <div class="brand-logo-wrap" onclick="window.saraviaOpenBrandStudio()">
+        <img src="./assets/logo-1024.svg" alt="SARAVIA Royal Emblem" style="cursor: pointer;" title="Click to view & download official app icons">
       </div>
-      <div class="brand-badge">Official Pi Network Mainnet Ecosystem</div>
+      <div class="brand-badge">Official Pi Network Ecosystem Application</div>
       <h1>SARAVIA <span>GLOBAL</span></h1>
       <p class="tagline">Decentralized luxury travel, private aviation, curated tours, and secure cargo logistics powered exclusively by Pi.</p>
     </header>
 
+    <!-- Session & Actions Panel -->
     <section class="session-panel">
       <div class="session-info" id="session-text">
         Connect your Pi account to access VIP reservations, flights, tours, and logistics.
@@ -37,15 +40,18 @@
         <button id="btn-login" class="btn" type="button">Connect with Pi</button>
         <button id="btn-support" class="btn" type="button" style="display: none;">Send 0.1 π Support</button>
         <button id="btn-open-receipts" class="btn btn-secondary" type="button">My Bookings</button>
+        <button id="btn-open-brand" class="btn btn-secondary" type="button">Brand Icons</button>
         <button id="btn-open-diag" class="btn btn-secondary" type="button">Gateway Status</button>
         <button id="btn-open-partner-modal" class="btn btn-secondary" type="button">+ List Your Service</button>
       </div>
     </section>
 
+    <!-- Search Input -->
     <div class="search-wrapper">
       <input type="text" id="search-input" class="search-input" placeholder="Search by city, airline, hotel, safari, or logistics...">
     </div>
 
+    <!-- Category Tabs -->
     <nav class="tabs-container">
       <button class="tab-btn active" data-filter="all">All Services</button>
       <button class="tab-btn" data-filter="stays">🏨 Hotels & Resorts</button>
@@ -54,10 +60,12 @@
       <button class="tab-btn" data-filter="logistics">🚚 Logistics & VIP Fleet</button>
     </nav>
 
+    <!-- Service Catalog Grid -->
     <main>
       <section id="services-catalog" class="service-grid"></section>
     </main>
 
+    <!-- Partner Merchant Section -->
     <section class="partner-section">
       <h2>Partner with SARAVIA Ecosystem</h2>
       <p>Are you a hotel operator, airline charter, tour company, or logistics enterprise? Offer your services to millions of verified Pioneers worldwide.</p>
@@ -67,6 +75,35 @@
     </section>
   </div>
 
+  <!-- Brand Asset Studio Modal -->
+  <div id="brand-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Official SARAVIA Brand Studio</h3>
+        <button id="btn-close-brand" class="close-modal">&times;</button>
+      </div>
+      <div style="text-align: center; margin-bottom: 1.5rem;">
+        <img src="./assets/logo-1024.svg" alt="Preview" style="width: 140px; height: 140px; border-radius: 28px; box-shadow: 0 10px 30px rgba(234, 179, 8, 0.35);">
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.75rem;">Vector Emblem & App Icon Assets for Pi Developer Portal & Listing</p>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+        <button class="btn btn-cyan" onclick="window.saraviaExportPNG(1024)" style="font-size: 0.8rem; justify-content: center;">
+          Download 1024×1024 PNG
+        </button>
+        <button class="btn btn-secondary" onclick="window.saraviaExportPNG(512)" style="font-size: 0.8rem; justify-content: center;">
+          Download 512×512 PNG
+        </button>
+        <button class="btn btn-secondary" onclick="window.saraviaExportPNG(192)" style="font-size: 0.8rem; justify-content: center;">
+          Download 192×192 PNG
+        </button>
+        <a href="./assets/logo-1024.svg" download="saravia-vector-emblem.svg" class="btn btn-secondary" style="font-size: 0.8rem; justify-content: center; text-decoration: none;">
+          Download Vector SVG
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Partner Listing Modal -->
   <div id="partner-modal" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">
@@ -106,6 +143,7 @@
     </div>
   </div>
 
+  <!-- Gateway Diagnostics Modal -->
   <div id="diag-modal" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">
@@ -118,6 +156,7 @@
     </div>
   </div>
 
+  <!-- Receipts Modal -->
   <div id="receipts-modal" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">

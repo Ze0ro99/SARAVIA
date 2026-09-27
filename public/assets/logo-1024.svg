@@ -1,45 +1,101 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
   <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0a0f1d"/>
-      <stop offset="50%" stop-color="#060913"/>
-      <stop offset="100%" stop-color="#020408"/>
+    <!-- Background Radial Gradients -->
+    <radialGradient id="bgSphere" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#11192e"/>
+      <stop offset="45%" stop-color="#0a0f1d"/>
+      <stop offset="80%" stop-color="#050811"/>
+      <stop offset="100%" stop-color="#020306"/>
+    </radialGradient>
+
+    <!-- Multi-Tone Royal Gold -->
+    <linearGradient id="royalGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff8db"/>
+      <stop offset="25%" stop-color="#fef08a"/>
+      <stop offset="50%" stop-color="#eab308"/>
+      <stop offset="75%" stop-color="#ca8a04"/>
+      <stop offset="100%" stop-color="#78350f"/>
     </linearGradient>
-    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#fef08a"/>
-      <stop offset="35%" stop-color="#eab308"/>
-      <stop offset="70%" stop-color="#ca8a04"/>
-      <stop offset="100%" stop-color="#854d0e"/>
+
+    <!-- Platinum Accent -->
+    <linearGradient id="platinumGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#64748b"/>
+      <stop offset="50%" stop-color="#cbd5e1"/>
+      <stop offset="100%" stop-color="#ffffff"/>
     </linearGradient>
-    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#38bdf8"/>
+
+    <!-- Celestial Cyan Shimmer -->
+    <linearGradient id="cyanGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#bae6fd"/>
+      <stop offset="50%" stop-color="#38bdf8"/>
       <stop offset="100%" stop-color="#0284c7"/>
     </linearGradient>
-    <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="12" result="blur"/>
+
+    <!-- Soft Glow Filters -->
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
       <feComposite in="SourceGraphic" in2="blur" operator="over"/>
     </filter>
+    <filter id="deepShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#000000" flood-opacity="0.8"/>
+    </filter>
   </defs>
-  <!-- Background Shape (1024x1024) -->
-  <rect width="1024" height="1024" rx="200" fill="url(#bgGrad)"/>
-  <rect width="1008" height="1008" x="8" y="8" rx="192" fill="none" stroke="url(#goldGrad)" stroke-width="6" opacity="0.45"/>
 
-  <!-- Celestial Compass Outer Rings -->
-  <circle cx="512" cy="512" r="370" fill="none" stroke="url(#goldGrad)" stroke-width="4" stroke-dasharray="20 16" opacity="0.6"/>
-  <circle cx="512" cy="512" r="330" fill="none" stroke="url(#goldGrad)" stroke-width="3" opacity="0.35"/>
+  <!-- Base Plate (1024x1024) with Curved Squircle Geometry -->
+  <rect width="1024" height="1024" rx="224" fill="url(#bgSphere)"/>
+  
+  <!-- Outer Filigree Borders -->
+  <rect width="1004" height="1004" x="10" y="10" rx="214" fill="none" stroke="url(#royalGold)" stroke-width="4" opacity="0.35"/>
+  <rect width="980" height="980" x="22" y="22" rx="202" fill="none" stroke="url(#royalGold)" stroke-width="1.5" stroke-dasharray="14 10" opacity="0.45"/>
 
-  <!-- Cardinal Compass Markers -->
-  <path d="M512 160 L524 210 L512 230 L500 210 Z" fill="url(#goldGrad)"/>
-  <path d="M512 864 L524 814 L512 794 L500 814 Z" fill="url(#goldGrad)"/>
-  <path d="M160 512 L210 524 L230 512 L210 500 Z" fill="url(#goldGrad)"/>
-  <path d="M864 512 L814 524 L794 512 L814 500 Z" fill="url(#goldGrad)"/>
+  <!-- Celestial Compass Astronomy Rings -->
+  <g opacity="0.6">
+    <circle cx="512" cy="512" r="390" fill="none" stroke="url(#royalGold)" stroke-width="2.5" opacity="0.3"/>
+    <circle cx="512" cy="512" r="360" fill="none" stroke="url(#royalGold)" stroke-width="3" stroke-dasharray="24 16"/>
+    <circle cx="512" cy="512" r="325" fill="none" stroke="url(#platinumGrad)" stroke-width="1.5" opacity="0.4"/>
+  </g>
 
-  <!-- Falcon Crest of Aviation, Travel & Luxury Logistics -->
-  <g filter="url(#goldGlow)">
-    <path d="M512 280 C640 360 780 400 840 440 C720 460 620 480 512 540 C404 480 304 460 184 440 C244 400 384 360 512 280 Z" fill="url(#goldGrad)" opacity="0.95"/>
-    <polygon points="512,340 632,512 512,720 392,512" fill="url(#bgGrad)" stroke="url(#goldGrad)" stroke-width="8"/>
-    <!-- Pi Royal Monogram S -->
-    <path d="M450 440 Q512 390 570 440 Q570 490 512 520 Q450 550 450 600 Q512 650 574 600" fill="none" stroke="url(#goldGrad)" stroke-width="24" stroke-linecap="round"/>
-    <circle cx="512" cy="750" r="14" fill="url(#cyanGrad)"/>
+  <!-- Precision Meridian Compass Ticks -->
+  <g fill="url(#royalGold)">
+    <path d="M512 110 L524 165 L512 185 L500 165 Z"/>
+    <path d="M512 914 L524 859 L512 839 L500 859 Z"/>
+    <path d="M110 512 L165 524 L185 512 L165 500 Z"/>
+    <path d="M914 512 L859 524 L839 512 L859 500 Z"/>
+    <!-- Diagonal Subtle Stars -->
+    <circle cx="240" cy="240" r="5" fill="#fef08a" opacity="0.7"/>
+    <circle cx="784" cy="240" r="5" fill="#fef08a" opacity="0.7"/>
+    <circle cx="240" cy="784" r="5" fill="#fef08a" opacity="0.7"/>
+    <circle cx="784" cy="784" r="5" fill="#fef08a" opacity="0.7"/>
+  </g>
+
+  <!-- Central Crest: Imperial Falcon Wings & Shield -->
+  <g filter="url(#deepShadow)">
+    <!-- Aerodynamic Falcon Wings (Aviation & Speed) -->
+    <path d="M512 250 C650 330 810 370 875 415 C750 435 635 460 512 525 C389 460 274 435 149 415 C214 370 374 330 512 250 Z" 
+          fill="url(#royalGold)" filter="url(#softGlow)"/>
+
+    <!-- Wing Plume Layer 2 (Refined Aerodynamics) -->
+    <path d="M512 300 C625 365 750 395 810 435 C705 450 610 475 512 530 C414 475 319 450 214 435 C274 395 399 365 512 300 Z" 
+          fill="url(#platinumGrad)" opacity="0.4"/>
+
+    <!-- Central Royal Diamond Coat of Arms -->
+    <polygon points="512,320 648,512 512,740 376,512" 
+             fill="url(#bgSphere)" stroke="url(#royalGold)" stroke-width="10"/>
+
+    <!-- Inner Faceted Gem Borders -->
+    <polygon points="512,350 622,512 512,704 402,512" 
+             fill="none" stroke="url(#royalGold)" stroke-width="3" opacity="0.6"/>
+
+    <!-- Intertwined SARAVIA 'S' & Mathematical Pi Arch -->
+    <path d="M440 430 Q512 375 575 430 Q575 485 512 515 Q440 545 440 605 Q512 660 580 605" 
+          fill="none" stroke="url(#royalGold)" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" filter="url(#softGlow)"/>
+
+    <!-- Crown Star of Excellence -->
+    <polygon points="512,375 520,395 540,398 524,412 529,432 512,420 495,432 500,412 484,398 504,395" 
+             fill="url(#royalGold)"/>
+
+    <!-- Sapphire Navigation Beacon -->
+    <circle cx="512" cy="770" r="16" fill="url(#cyanGlow)" filter="url(#softGlow)"/>
+    <circle cx="512" cy="770" r="8" fill="#ffffff"/>
   </g>
 </svg>
