@@ -1,5 +1,5 @@
 (function () {
-  const TESTNET_CATALOG = [
+  const MASTER_CATALOG = [
     {
       id: "dubai-resort",
       category: "stays",
@@ -19,11 +19,20 @@
       badge: "Signature Collection"
     },
     {
+      id: "tokyo-skyline",
+      category: "stays",
+      title: "Shinjuku Skyline Retreat",
+      location: "Tokyo, Japan",
+      description: "Panoramic executive suite with private tea master experience and station meet-and-greet.",
+      deposit: 0.1,
+      badge: "VIP Stay"
+    },
+    {
       id: "jet-charter",
       category: "flights",
       title: "Gulfstream G650 Private Charter",
       location: "Transcontinental (London - Dubai - Tokyo)",
-      description: "Exclusive private terminal clearance, Michelin-inspired catering, and instant aircraft dispatch.",
+      description: "Private jet booking deposit. Exclusive private terminal clearance, chef catering, and instant dispatch.",
       deposit: 0.1,
       badge: "Private Jet"
     },
@@ -32,7 +41,7 @@
       category: "flights",
       title: "First Class Sky Suites",
       location: "Global Commercial Airlines",
-      description: "Private first-class flatbed cabin with VIP tarmac lounge transit and bespoke catering.",
+      description: "First-class cabin reservation deposit with private flatbed suites and VIP tarmac transport.",
       deposit: 0.1,
       badge: "Commercial Flight"
     },
@@ -57,18 +66,18 @@
     {
       id: "armored-fleet",
       category: "logistics",
-      title: "Armored VIP Executive Limousine",
+      title: "Armored VIP Executive Transport",
       location: "Global Metropolitan Hubs",
-      description: "B6 level executive armored Mercedes Maybach fleet with certified close protection security driver.",
+      description: "B6 level executive armored Mercedes Maybach fleet with certified close protection drivers.",
       deposit: 0.1,
       badge: "VIP Fleet"
     },
     {
       id: "express-cargo",
       category: "logistics",
-      title: "Pi Express Air Freight & High-Value Cargo",
+      title: "Pi Express Air Freight & Logistics",
       location: "Worldwide Freight Corridors",
-      description: "Secure priority logistics deposit for high-value assets, luxury goods, and diplomatic courier cargo.",
+      description: "Secure priority logistics deposit for high-value assets, artwork, and express courier freight.",
       deposit: 0.1,
       badge: "Global Logistics"
     }
@@ -76,7 +85,7 @@
 
   function getStoredListings() {
     try {
-      const stored = localStorage.getItem("saravia_testnet_listings");
+      const stored = localStorage.getItem("saravia_partner_listings");
       return stored ? JSON.parse(stored) : [];
     } catch (e) {
       return [];
@@ -84,7 +93,7 @@
   }
 
   function getAllServices() {
-    return [...TESTNET_CATALOG, ...getStoredListings()];
+    return [...MASTER_CATALOG, ...getStoredListings()];
   }
 
   let currentCategory = "all";
@@ -110,7 +119,7 @@
     }
 
     if (items.length === 0) {
-      grid.innerHTML = '<p style="text-align:center; grid-column: 1/-1; color: var(--text-muted); padding: 3rem;">No services match your search criteria.</p>';
+      grid.innerHTML = '<p style="text-align:center; grid-column: 1/-1; color: var(--text-muted); padding: 3rem;">No services found matching your criteria.</p>';
       return;
     }
 
@@ -125,11 +134,11 @@
         <p class="service-desc">${item.description}</p>
         <div class="card-footer">
           <div class="price-box">
-            <span class="price-label">Testnet Deposit</span>
-            <span class="price-value">${item.deposit} Test-π</span>
+            <span class="price-label">Booking Deposit</span>
+            <span class="price-value">${item.deposit} π</span>
           </div>
           <button class="btn btn-reserve" data-id="${item.id}" data-deposit="${item.deposit}" data-title="${item.title}">
-            Reserve (Test-π)
+            Reserve with Pi
           </button>
         </div>
       </article>
@@ -142,13 +151,13 @@
     const title = btn.getAttribute("data-title");
 
     if (typeof window.saraviaPay !== "function") {
-      throw new Error("Please open SARAVIA inside Pi Browser and sign in first.");
+      throw new Error("Please open SARAVIA inside Pi Browser and authenticate first.");
     }
 
     await window.saraviaPay(
       deposit,
-      `SARAVIA Testnet: ${title}`,
-      { serviceId: serviceId, title: title, network: "testnet" }
+      `SARAVIA: ${title}`,
+      { serviceId: serviceId, title: title, action: "reservation" }
     );
   }
 
@@ -190,25 +199,25 @@
       partnerForm.addEventListener("submit", (e) => {
         e.preventDefault();
         const newListing = {
-          id: "testnet-" + Date.now(),
+          id: "custom-" + Date.now(),
           category: document.getElementById("p-category").value,
           title: document.getElementById("p-title").value.trim(),
           location: document.getElementById("p-location").value.trim(),
           description: document.getElementById("p-desc").value.trim(),
           deposit: parseFloat(document.getElementById("p-deposit").value) || 0.1,
-          badge: "Testnet Merchant"
+          badge: "Partner Merchant"
         };
 
         const existing = getStoredListings();
         existing.unshift(newListing);
-        localStorage.setItem("saravia_testnet_listings", JSON.stringify(existing));
+        localStorage.setItem("saravia_partner_listings", JSON.stringify(existing));
 
         renderServices();
         document.getElementById("partner-modal").style.display = "none";
         partnerForm.reset();
 
         if (window.saraviaToast) {
-          window.saraviaToast("Listing added to Testnet directory!", "success");
+          window.saraviaToast("Listing published to SARAVIA catalog!", "success");
         }
       });
     }

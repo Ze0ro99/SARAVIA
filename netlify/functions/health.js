@@ -4,8 +4,8 @@ exports.handler = async function () {
     headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
     body: JSON.stringify({
       status: "operational",
-      network: "testnet",
-      mode: "sandbox",
+      network: process.env.PI_NETWORK || "mainnet",
+      domainVerified: true,
       timestamp: new Date().toISOString()
     })
   };

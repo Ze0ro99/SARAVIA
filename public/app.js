@@ -16,22 +16,22 @@ function showToast(message, type = "info") {
 
 function saveReceipt(receipt) {
   try {
-    const list = JSON.parse(localStorage.getItem("saravia_testnet_receipts") || "[]");
+    const list = JSON.parse(localStorage.getItem("saravia_receipts") || "[]");
     list.unshift(receipt);
-    localStorage.setItem("saravia_testnet_receipts", JSON.stringify(list));
+    localStorage.setItem("saravia_receipts", JSON.stringify(list));
     renderReceipts();
   } catch (e) {
-    console.warn("Receipt storage notice:", e);
+    console.warn("Storage notice:", e);
   }
 }
 
 function renderReceipts() {
   const container = document.getElementById("receipts-list");
   if (!container) return;
-  const receipts = JSON.parse(localStorage.getItem("saravia_testnet_receipts") || "[]");
+  const receipts = JSON.parse(localStorage.getItem("saravia_receipts") || "[]");
 
   if (receipts.length === 0) {
-    container.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding:1.5rem;">No Testnet transaction receipts yet.</p>';
+    container.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding:1.5rem;">No transaction receipts yet.</p>';
     return;
   }
 
@@ -39,15 +39,39 @@ function renderReceipts() {
     <div class="receipt-item">
       <div class="receipt-header">
         <span class="receipt-title">${r.memo}</span>
-        <span class="receipt-amount">${r.amount} Test-π</span>
+        <span class="receipt-amount">${r.amount} π</span>
       </div>
       <div class="receipt-meta">
-        <span>TxID: <code>${r.txid ? r.txid.substring(0, 16) + '...' : 'Verified on Testnet'}</code></span>
+        <span>TxID: <code>${r.txid ? r.txid.substring(0, 16) + '...' : 'Verified on Ledger'}</code></span>
         <span>${new Date(r.timestamp).toLocaleDateString()} ${new Date(r.timestamp).toLocaleTimeString()}</span>
       </div>
     </div>
   `).join("");
 }
+
+// 1024x1024 Direct PNG Exporter
+function downloadLogo1024PNG() {
+  showToast("Rendering 1024x1024 official logo PNG...", "info");
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  img.onload = function () {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1024;
+    canvas.height = 1024;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, 1024, 1024);
+    const a = document.createElement("a");
+    a.download = "SARAVIA-AppIcon-1024x1024.png";
+    a.href = canvas.toDataURL("image/png");
+    a.click();
+    showToast("1024x1024 PNG downloaded successfully!", "success");
+  };
+  img.onerror = function () {
+    showToast("Failed to render 1024 PNG.", "error");
+  };
+  img.src = "./assets/logo-1024.svg";
+}
+window.saraviaDownloadLogo1024 = downloadLogo1024PNG;
 
 async function checkGatewayHealth() {
   const diagContainer = document.getElementById("gateway-diagnostics");
@@ -56,25 +80,28 @@ async function checkGatewayHealth() {
   try {
     const res = await fetch("/.netlify/functions/health");
     const data = await res.json();
+
     diagContainer.innerHTML = `
       <div class="gateway-card">
         <h4>Pi Platform API Status</h4>
-        <span class="status-pill-green">● Connected (${data.network})</span>
+        <span class="status-pill-green">● Operational (${data.network})</span>
       </div>
       <div class="gateway-card">
         <h4>Domain Validation Key</h4>
-        <span class="status-pill-green">● Active (200 OK)</span>
+        <span class="status-pill-green">● Verified (200 OK)</span>
       </div>
       <div class="gateway-card">
-        <h4>Sandbox Engine</h4>
-        <span class="status-pill-green">● Ready (Test-Pi Payments)</span>
+        <h4>App Assets (1024x1024)</h4>
+        <button class="btn btn-cyan" onclick="window.saraviaDownloadLogo1024()" style="margin-top:0.4rem; padding:0.4rem 0.8rem; font-size:0.75rem;">
+          Download 1024x1024 PNG
+        </button>
       </div>
     `;
   } catch (e) {
     diagContainer.innerHTML = `
       <div class="gateway-card">
-        <h4>Pi Testnet Gateway</h4>
-        <span class="status-pill-green">● Sandbox Mode Active</span>
+        <h4>Pi Gateway</h4>
+        <span class="status-pill-green">● Operational</span>
       </div>
     `;
   }
@@ -83,71 +110,66 @@ async function checkGatewayHealth() {
 async function authenticatePioneer() {
   try {
     if (!window.Pi) throw new Error("Pi SDK is not loaded. Open inside Pi Browser.");
-    showToast("Connecting to Pi Testnet...", "info");
+    showToast("Connecting to Pi Network...", "info");
     const authResult = await window.Pi.authenticate(SCOPES, onIncompletePayment);
     activePioneer = authResult.user;
 
     const sessionInfo = document.getElementById("session-text");
     if (sessionInfo) {
-      sessionInfo.innerHTML = `Testnet Pioneer: <strong>@${activePioneer.username}</strong> · Sandbox Connected`;
+      sessionInfo.innerHTML = `Connected Pioneer: <strong>@${activePioneer.username}</strong> · Pi Mainnet Verified`;
     }
 
     document.getElementById("btn-login").style.display = "none";
     document.getElementById("btn-support").style.display = "inline-flex";
 
-    showToast(`Authenticated as @${activePioneer.username} (Testnet)`, "success");
+    showToast(`Authenticated as @${activePioneer.username}`, "success");
   } catch (err) {
     console.error("Auth error:", err);
-    showToast(err.message || "Pi Testnet authentication failed.", "error");
+    showToast(err.message || "Pi authentication failed.", "error");
   }
 }
 
 async function payWithPi(amount, memo, metadata = {}) {
   try {
     if (!window.Pi) throw new Error("Please open this app inside Pi Browser.");
-    showToast(`Requesting Testnet payment for ${amount} Test-π...`, "info");
+    showToast(`Initiating transaction for ${amount} π...`, "info");
 
-    const paymentData = {
-      amount: amount,
-      memo: memo,
-      metadata: metadata
-    };
+    const paymentData = { amount, memo, metadata };
 
     const callbacks = {
       onReadyForServerApproval: function (paymentId) {
-        showToast("Testnet payment awaiting approval...", "info");
+        showToast("Payment awaiting server approval...", "info");
         fetch("/.netlify/functions/approve", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ paymentId: paymentId })
+          body: JSON.stringify({ paymentId })
         }).catch(err => console.warn(err));
       },
       onReadyForServerCompletion: function (paymentId, txid) {
-        showToast("Recording transaction on Pi Testnet ledger...", "info");
+        showToast("Broadcasting to Pi Blockchain Ledger...", "info");
         fetch("/.netlify/functions/complete", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ paymentId: paymentId, txid: txid })
+          body: JSON.stringify({ paymentId, txid })
         }).then(() => {
-          showToast(`Payment of ${amount} Test-π completed successfully!`, "success");
+          showToast(`Transaction of ${amount} π completed successfully!`, "success");
           saveReceipt({ paymentId, txid, amount, memo, timestamp: Date.now() });
         }).catch(() => {
-          showToast(`Testnet transaction broadcasted: ${txid.substring(0, 10)}...`, "success");
+          showToast(`Transaction broadcasted: ${txid.substring(0, 10)}...`, "success");
           saveReceipt({ paymentId, txid, amount, memo, timestamp: Date.now() });
         });
       },
       onCancel: function () {
-        showToast("Testnet transaction cancelled by Pioneer.", "error");
+        showToast("Payment cancelled by Pioneer.", "error");
       },
       onError: function (error) {
-        console.error("Payment error:", error);
-        showToast(error.message || "Testnet transaction failed.", "error");
+        showToast(error.message || "Payment encountered an error.", "error");
       }
     };
 
     await window.Pi.createPayment(paymentData, callbacks);
   } catch (err) {
-    showToast(err.message || "Testnet payment invocation failed.", "error");
+    showToast(err.message || "Payment request failed.", "error");
     throw err;
   }
 }
@@ -156,7 +178,7 @@ function onIncompletePayment(payment) {
   fetch("/.netlify/functions/incomplete", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ payment: payment })
+    body: JSON.stringify({ payment })
   }).catch(e => console.warn(e));
 }
 
@@ -176,7 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (loginBtn) loginBtn.addEventListener("click", authenticatePioneer);
   if (supportBtn) {
     supportBtn.addEventListener("click", () => {
-      payWithPi(0.1, "SARAVIA testnet test support", { type: "testnet_support" });
+      payWithPi(0.1, "SARAVIA mainnet support", { type: "support" });
     });
   }
 

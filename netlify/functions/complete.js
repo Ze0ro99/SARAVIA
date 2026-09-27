@@ -17,23 +17,20 @@ exports.handler = async function (event) {
 
   try {
     const { paymentId, txid } = JSON.parse(event.body || "{}");
-    if (!paymentId || !txid) return { statusCode: 400, body: JSON.stringify({ error: "Missing parameters" }) };
+    if (!paymentId || !txid) return { statusCode: 400, body: JSON.stringify({ error: "Missing paymentId or txid" }) };
 
     const apiKey = process.env.PI_API_KEY;
     if (!apiKey) {
       return {
         statusCode: 200,
         headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-        body: JSON.stringify({ status: "completed", mode: "testnet-sandbox" })
+        body: JSON.stringify({ status: "completed", warning: "PI_API_KEY_UNSET" })
       };
     }
 
     const response = await fetch(`${PI_API_URL}/payments/${paymentId}/complete`, {
       method: "POST",
-      headers: {
-        "Authorization": `Key ${apiKey}`,
-        "Content-Type": "application/json"
-      },
+      headers: { "Authorization": `Key ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({ txid: txid })
     });
 

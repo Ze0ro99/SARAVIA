@@ -24,16 +24,13 @@ exports.handler = async function (event) {
       return {
         statusCode: 200,
         headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-        body: JSON.stringify({ status: "acknowledged", mode: "testnet-sandbox" })
+        body: JSON.stringify({ status: "acknowledged", warning: "PI_API_KEY_UNSET" })
       };
     }
 
     const response = await fetch(`${PI_API_URL}/payments/${paymentId}/approve`, {
       method: "POST",
-      headers: {
-        "Authorization": `Key ${apiKey}`,
-        "Content-Type": "application/json"
-      }
+      headers: { "Authorization": `Key ${apiKey}`, "Content-Type": "application/json" }
     });
 
     const data = await response.json();

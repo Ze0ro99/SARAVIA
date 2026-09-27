@@ -3,17 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SARAVIA · Pi Testnet Travel, Tours, Aviation & Logistics</title>
+  <title>SARAVIA · Pi Mainnet Luxury Travel, Aviation & Logistics</title>
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="apple-touch-icon" href="./assets/logo-1024.svg">
   <link rel="stylesheet" href="./styles.css">
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
   <script>
     try {
       if (window.Pi) {
-        window.Pi.init({ version: "2.0", sandbox: true });
+        window.Pi.init({ version: "2.0", sandbox: false });
       }
     } catch (e) {
-      console.warn("Pi Testnet SDK init notice:", e);
+      console.warn("Pi SDK init notice:", e);
     }
   </script>
 </head>
@@ -21,20 +22,20 @@
   <div class="container">
     <header>
       <div class="brand-logo-wrap">
-        <img src="./assets/logo.svg" alt="SARAVIA Emblem">
+        <img src="./assets/logo-1024.svg" alt="SARAVIA Emblem 1024x1024">
       </div>
-      <div class="testnet-badge">PI TESTNET SANDBOX ECOSYSTEM</div>
+      <div class="brand-badge">Official Pi Network Mainnet Ecosystem</div>
       <h1>SARAVIA <span>GLOBAL</span></h1>
-      <p class="tagline">Testnet environment for luxury stays, airline reservations, curated tours, and VIP logistics powered by Test-Pi.</p>
+      <p class="tagline">Decentralized luxury travel, private aviation, curated tours, and secure cargo logistics powered exclusively by Pi.</p>
     </header>
 
     <section class="session-panel">
       <div class="session-info" id="session-text">
-        Connect your Pi account to test bookings and simulated payments using Test-Pi.
+        Connect your Pi account to access VIP reservations, flights, tours, and logistics.
       </div>
       <div class="button-group">
-        <button id="btn-login" class="btn" type="button">Connect with Pi (Testnet)</button>
-        <button id="btn-support" class="btn" type="button" style="display: none;">Send 0.1 Test-π Support</button>
+        <button id="btn-login" class="btn" type="button">Connect with Pi</button>
+        <button id="btn-support" class="btn" type="button" style="display: none;">Send 0.1 π Support</button>
         <button id="btn-open-receipts" class="btn btn-secondary" type="button">My Bookings</button>
         <button id="btn-open-diag" class="btn btn-secondary" type="button">Gateway Status</button>
         <button id="btn-open-partner-modal" class="btn btn-secondary" type="button">+ List Your Service</button>
@@ -42,7 +43,7 @@
     </section>
 
     <div class="search-wrapper">
-      <input type="text" id="search-input" class="search-input" placeholder="Search stays, airlines, desert safaris, tours, or logistics...">
+      <input type="text" id="search-input" class="search-input" placeholder="Search by city, airline, hotel, safari, or logistics...">
     </div>
 
     <nav class="tabs-container">
@@ -58,9 +59,9 @@
     </main>
 
     <section class="partner-section">
-      <h2>Partner with SARAVIA Testnet Ecosystem</h2>
-      <p>Simulate listing your hotel, airline charter, tour package, or transport fleet on the Pi Network developer sandbox.</p>
-      <button class="btn btn-cyan" onclick="document.getElementById('partner-modal').style.display='flex'">
+      <h2>Partner with SARAVIA Ecosystem</h2>
+      <p>Are you a hotel operator, airline charter, tour company, or logistics enterprise? Offer your services to millions of verified Pioneers worldwide.</p>
+      <button class="btn btn-purple" onclick="document.getElementById('partner-modal').style.display='flex'">
         Submit Merchant Listing
       </button>
     </section>
@@ -69,7 +70,7 @@
   <div id="partner-modal" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">
-        <h3>List Your Service (Testnet)</h3>
+        <h3>List Your Service</h3>
         <button class="close-modal" onclick="document.getElementById('partner-modal').style.display='none'">&times;</button>
       </div>
       <form id="partner-form">
@@ -78,25 +79,25 @@
           <select id="p-category" class="form-control" required>
             <option value="stays">Hotel / Luxury Stay</option>
             <option value="flights">Aviation / Airline Flight</option>
-            <option value="tours">Curated Tour / Excursion</option>
+            <option value="tours">Curated Tour / Safari</option>
             <option value="logistics">Logistics / VIP Transport</option>
           </select>
         </div>
         <div class="form-group">
-          <label for="p-title">Service / Business Name</label>
-          <input type="text" id="p-title" class="form-control" placeholder="e.g. Royal Desert Excursions" required>
+          <label for="p-title">Business / Service Name</label>
+          <input type="text" id="p-title" class="form-control" placeholder="e.g. Skyline Private Charters" required>
         </div>
         <div class="form-group">
           <label for="p-location">Location / Coverage Area</label>
-          <input type="text" id="p-location" class="form-control" placeholder="e.g. Dubai - Abu Dhabi" required>
+          <input type="text" id="p-location" class="form-control" placeholder="e.g. Zurich - New York" required>
         </div>
         <div class="form-group">
-          <label for="p-deposit">Booking Deposit (Test-π)</label>
+          <label for="p-deposit">Booking Deposit (π)</label>
           <input type="number" step="0.01" min="0.01" id="p-deposit" class="form-control" value="0.1" required>
         </div>
         <div class="form-group">
           <label for="p-desc">Service Description</label>
-          <textarea id="p-desc" class="form-control" rows="3" placeholder="Describe package, itinerary details, vehicle specifications..." required></textarea>
+          <textarea id="p-desc" class="form-control" rows="3" placeholder="Describe the luxury service, vehicle/room specifications..." required></textarea>
         </div>
         <button type="submit" class="btn" style="width: 100%; justify-content: center; margin-top: 0.5rem;">
           Publish Listing Instantly
@@ -120,7 +121,7 @@
   <div id="receipts-modal" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">
-        <h3>My Testnet Bookings & Receipts</h3>
+        <h3>My Bookings & Receipts</h3>
         <button id="btn-close-receipts" class="close-modal">&times;</button>
       </div>
       <div id="receipts-list" class="receipts-box"></div>
