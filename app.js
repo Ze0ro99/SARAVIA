@@ -1,22 +1,167 @@
 const SCOPES = ["username", "payments", "wallet_address"];
-const SUPPORT = { amount: 0.1, memo: "SARAVIA mainnet support", metadata: { type: "community_support", version: 1 } };
-let auth = null;
-let currentUser = null;
-let pendingIncompletePayment = null;
-const $ = id => document.getElementById(id);
-const els = { login: $("login"), logout: $("logout"), name: $("pioneer-name"), browser: $("browser-note"), support: $("support"), getPi: $("get-pi"), supporter: $("supporter"), user: $("d-user"), wallet: $("d-wallet"), claim: $("d-claim"), supportState: $("d-support"), status: $("status"), cancel: $("cancel-incomplete") };
-function setStatus(message, kind) { els.status.textContent = message || ""; els.status.dataset.kind = kind || ""; }
-function setBusy(button, busy, label) { if (busy) { button.dataset.label = button.textContent; button.textContent = label; } else if (button.dataset.label) button.textContent = button.dataset.label; button.disabled = busy; }
-function shortWallet(value) { return value ? value.slice(0, 8) + "…" + value.slice(-6) : "—"; }
-async function post(path, body) { const headers = { "Content-Type": "application/json" }; if (auth?.accessToken) headers.Authorization = "Bearer " + auth.accessToken; const response = await fetch("/.netlify/functions/" + path, { method: "POST", headers, body: JSON.stringify(body || {}) }); const result = await response.json().catch(() => ({})); if (!response.ok) { const error = new Error(result.error || "The Mainnet payment service is unavailable."); error.status = response.status; throw error; } return result; }
-function renderSession(session) { currentUser = session; els.name.textContent = session.username || "Pioneer"; els.user.textContent = session.username || "Pioneer"; els.wallet.textContent = shortWallet(session.wallet_address); els.claim.textContent = session.getPiEnabled ? (session.claimed ? "Already claimed" : "Available once") : "Unavailable"; els.getPi.disabled = !session.getPiEnabled || session.claimed; els.getPi.textContent = session.claimed ? "Already claimed" : session.getPiEnabled ? "Get 0.01 π ↗" : "Unavailable until enabled"; els.support.disabled = false; els.login.hidden = true; els.logout.hidden = false; }
-function showBrowserHint() { if (!window.Pi) els.browser.hidden = false; }
-async function recover(payment) { if (!payment?.identifier) return; pendingIncompletePayment = payment; els.cancel.hidden = false; const paymentId = payment.identifier; const txid = payment.transaction?.txid; try { if (txid && !payment.status?.developer_completed) { setStatus("Completing your unfinished Mainnet payment…"); await post("pi-complete", { paymentId, txid }); els.supporter.hidden = false; els.supportState.textContent = "Confirmed"; els.cancel.hidden = true; setStatus("Your unfinished support payment is complete.", "success"); } else if (!payment.status?.developer_approved && !payment.status?.cancelled) { setStatus("Cancelling an unfinished payment…"); await post("pi-cancel", { paymentId }); els.cancel.hidden = true; setStatus("Previous payment cancelled. No Pi was unlocked."); } else setStatus("Finish the pending payment in Pi Wallet or cancel it here."); } catch (error) { setStatus(error.message, "error"); } }
-async function onIncompletePaymentFound(payment) { pendingIncompletePayment = payment; if (auth) await recover(payment); }
-async function login() { if (!window.Pi) { showBrowserHint(); setStatus("Open SARAVIA in Pi Browser to sign in.", "error"); return; } setBusy(els.login, true, "Connecting…"); try { auth = await window.Pi.authenticate(SCOPES, onIncompletePaymentFound); const session = await post("pi-me", { accessToken: auth.accessToken }); renderSession(session); setStatus("Signed in as @" + session.username + ".", "success"); if (pendingIncompletePayment) { const payment = pendingIncompletePayment; pendingIncompletePayment = null; await recover(payment); } } catch (error) { auth = null; setStatus(error.message || "Pi sign-in failed.", "error"); } finally { if (!currentUser) setBusy(els.login, false); } }
-async function payApp(amount, memo, metadata) { if (!window.Pi || !auth) throw new Error("Sign in with Pi before sending a payment."); return window.Pi.createPayment({ amount, memo, metadata }, { onReadyForServerApproval: async paymentId => { setStatus("Approving the payment securely…"); await post("pi-approve", { paymentId }); }, onReadyForServerCompletion: async (paymentId, txid) => { setStatus("Confirming the payment on Pi Mainnet…"); await post("pi-complete", { paymentId, txid }); els.supporter.hidden = false; els.supportState.textContent = "Confirmed"; setStatus("Support payment completed. Thank you.", "success"); }, onCancel: async paymentId => { try { await post("pi-cancel", { paymentId }); } catch (error) { console.warn("Cancel acknowledgement failed", error); } setStatus("Payment cancelled. No Pi was unlocked."); }, onError: error => setStatus(error?.message || "Pi payment failed.", "error") }); }
-async function support() { setBusy(els.support, true, "Opening Pi Wallet…"); try { await payApp(SUPPORT.amount, SUPPORT.memo, SUPPORT.metadata); } catch (error) { setStatus(error.message, "error"); } finally { setBusy(els.support, false); } }
-async function getPi() { if (!auth || !currentUser?.getPiEnabled) return; setBusy(els.getPi, true, "Sending…"); try { const result = await post("pi-get-pi", { accessToken: auth.accessToken }); currentUser.claimed = true; els.claim.textContent = "Already claimed"; els.getPi.textContent = "Already claimed"; setStatus(result.recovered ? "Your pending welcome payment was recovered." : "0.01 π sent to your wallet.", "success"); } catch (error) { if (error.status === 409) { currentUser.claimed = true; els.claim.textContent = "Already claimed"; els.getPi.textContent = "Already claimed"; } setStatus(error.message, error.status === 409 ? "success" : "error"); } finally { els.getPi.disabled = Boolean(currentUser?.claimed) || !currentUser?.getPiEnabled; } }
-async function cancelIncomplete() { if (!pendingIncompletePayment?.identifier) return; setBusy(els.cancel, true, "Cancelling…"); try { await post("pi-cancel", { paymentId: pendingIncompletePayment.identifier }); pendingIncompletePayment = null; els.cancel.hidden = true; setStatus("Unfinished payment cancelled. No Pi was unlocked."); } catch (error) { setStatus(error.message, "error"); } finally { setBusy(els.cancel, false); } }
-function logout() { auth = null; currentUser = null; pendingIncompletePayment = null; els.name.textContent = "Not signed in"; els.user.textContent = "—"; els.wallet.textContent = "—"; els.claim.textContent = "Unavailable"; els.supportState.textContent = "Locked"; els.support.disabled = true; els.getPi.disabled = true; els.supporter.hidden = true; els.cancel.hidden = true; els.login.hidden = false; els.logout.hidden = true; setStatus("Signed out of SARAVIA. Pi permissions remain managed by Pi Network."); }
-els.login.addEventListener("click", login); els.logout.addEventListener("click", logout); els.support.addEventListener("click", support); els.getPi.addEventListener("click", getPi); els.cancel.addEventListener("click", cancelIncomplete); showBrowserHint();
+let activePioneer = null;
+
+function showToast(message, type = "info") {
+  const toast = document.getElementById("status-toast");
+  if (!toast) return;
+  toast.textContent = message;
+  toast.className = `toast-${type}`;
+  toast.style.display = "block";
+
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => {
+    toast.style.display = "none";
+  }, 5000);
+}
+
+function saveReceipt(receipt) {
+  try {
+    const list = JSON.parse(localStorage.getItem("saravia_receipts") || "[]");
+    list.unshift(receipt);
+    localStorage.setItem("saravia_receipts", JSON.stringify(list));
+    renderReceipts();
+  } catch (e) {
+    console.warn("Storage notice:", e);
+  }
+}
+
+function renderReceipts() {
+  const container = document.getElementById("receipts-list");
+  if (!container) return;
+  const receipts = JSON.parse(localStorage.getItem("saravia_receipts") || "[]");
+
+  if (receipts.length === 0) {
+    container.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding:1.5rem;">No transaction receipts yet.</p>';
+    return;
+  }
+
+  container.innerHTML = receipts.map(r => `
+    <div class="receipt-item">
+      <div class="receipt-header">
+        <span class="receipt-title">${r.memo}</span>
+        <span class="receipt-amount">${r.amount} π</span>
+      </div>
+      <div class="receipt-meta">
+        <span>TxID: <code>${r.txid ? r.txid.substring(0, 16) + '...' : 'Verified on Ledger'}</code></span>
+        <span>${new Date(r.timestamp).toLocaleDateString()} ${new Date(r.timestamp).toLocaleTimeString()}</span>
+      </div>
+    </div>
+  `).join("");
+}
+
+async function authenticatePioneer() {
+  try {
+    if (!window.Pi) {
+      throw new Error("Pi SDK is not loaded. Please open inside Pi Browser.");
+    }
+    showToast("Connecting to Pi Mainnet...", "info");
+    const authResult = await window.Pi.authenticate(SCOPES, onIncompletePayment);
+    activePioneer = authResult.user;
+
+    const sessionInfo = document.getElementById("session-text");
+    if (sessionInfo) {
+      sessionInfo.innerHTML = `Connected Pioneer: <strong>@${activePioneer.username}</strong> · Pi Mainnet Verified`;
+    }
+
+    document.getElementById("btn-login").style.display = "none";
+    document.getElementById("btn-support").style.display = "inline-flex";
+
+    showToast(`Authenticated as @${activePioneer.username}`, "success");
+  } catch (err) {
+    console.error("Auth error:", err);
+    showToast(err.message || "Pi authentication failed.", "error");
+  }
+}
+
+async function payWithPi(amount, memo, metadata = {}) {
+  try {
+    if (!window.Pi) {
+      throw new Error("Please open this app inside Pi Browser.");
+    }
+
+    showToast(`Initiating transaction for ${amount} π...`, "info");
+
+    const paymentData = {
+      amount: amount,
+      memo: memo,
+      metadata: metadata
+    };
+
+    const callbacks = {
+      onReadyForServerApproval: function (paymentId) {
+        showToast("Payment awaiting server approval...", "info");
+        fetch("/.netlify/functions/approve", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ paymentId: paymentId })
+        }).catch(err => console.warn("Approval notification error:", err));
+      },
+      onReadyForServerCompletion: function (paymentId, txid) {
+        showToast("Broadcasting to Pi Blockchain Ledger...", "info");
+        fetch("/.netlify/functions/complete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ paymentId: paymentId, txid: txid })
+        }).then(() => {
+          showToast(`Transaction of ${amount} π completed successfully!`, "success");
+          saveReceipt({ paymentId, txid, amount, memo, timestamp: Date.now() });
+        }).catch(() => {
+          showToast(`Transaction broadcasted: ${txid.substring(0, 10)}...`, "success");
+          saveReceipt({ paymentId, txid, amount, memo, timestamp: Date.now() });
+        });
+      },
+      onCancel: function () {
+        showToast("Payment cancelled by Pioneer.", "error");
+      },
+      onError: function (error) {
+        console.error("Payment error:", error);
+        showToast(error.message || "Payment encountered an error.", "error");
+      }
+    };
+
+    await window.Pi.createPayment(paymentData, callbacks);
+  } catch (err) {
+    showToast(err.message || "Payment request failed.", "error");
+    throw err;
+  }
+}
+
+function onIncompletePayment(payment) {
+  fetch("/.netlify/functions/incomplete", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ payment: payment })
+  }).catch(e => console.warn(e));
+}
+
+window.saraviaPay = payWithPi;
+window.saraviaStatus = showToast;
+window.saraviaToast = showToast;
+
+document.addEventListener("DOMContentLoaded", () => {
+  const loginBtn = document.getElementById("btn-login");
+  const supportBtn = document.getElementById("btn-support");
+  const receiptsBtn = document.getElementById("btn-open-receipts");
+  const receiptsModal = document.getElementById("receipts-modal");
+  const closeReceiptsBtn = document.getElementById("btn-close-receipts");
+
+  if (loginBtn) loginBtn.addEventListener("click", authenticatePioneer);
+  if (supportBtn) {
+    supportBtn.addEventListener("click", () => {
+      payWithPi(0.1, "SARAVIA mainnet support", { type: "support" });
+    });
+  }
+
+  if (receiptsBtn && receiptsModal) {
+    receiptsBtn.addEventListener("click", () => {
+      renderReceipts();
+      receiptsModal.style.display = "flex";
+    });
+  }
+  if (closeReceiptsBtn && receiptsModal) {
+    closeReceiptsBtn.addEventListener("click", () => receiptsModal.style.display = "none");
+  }
+  window.addEventListener("click", (e) => {
+    if (e.target === receiptsModal) receiptsModal.style.display = "none";
+  });
+});

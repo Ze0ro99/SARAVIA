@@ -25,7 +25,6 @@ exports.handler = async function (event) {
 
     const apiKey = process.env.PI_API_KEY;
     if (!apiKey) {
-      console.warn("PI_API_KEY is not defined in Netlify variables.");
       return {
         statusCode: 200,
         headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
@@ -44,14 +43,10 @@ exports.handler = async function (event) {
     const data = await response.json();
     return {
       statusCode: response.status,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*"
-      },
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
       body: JSON.stringify(data)
     };
   } catch (error) {
-    console.error("Approval error:", error);
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SARAVIA · Pi Mainnet Luxury Travel, Aviation & Logistics</title>
+  <title>SARAVIA · Pi Mainnet</title>
   <link rel="stylesheet" href="./styles.css">
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
   <script>
@@ -12,21 +12,21 @@
         window.Pi.init({ version: "2.0", sandbox: false });
       }
     } catch (e) {
-      console.warn("Pi SDK init status:", e);
+      console.warn("Pi SDK init notice:", e);
     }
   </script>
 </head>
 <body>
   <div class="container">
     <header>
-      <div class="brand-badge">Official Pi Network Mainnet Application</div>
+      <div class="brand-badge">PI MAINNET ECOSYSTEM</div>
       <h1>SARAVIA <span>GLOBAL</span></h1>
-      <p class="tagline">Decentralized luxury travel, private aviation, executive stays, and secure cargo logistics powered entirely by Pi.</p>
+      <p class="tagline">Decentralized luxury travel, private aviation, curated tours, and secure cargo logistics powered exclusively by Pi.</p>
     </header>
 
     <section class="session-panel">
       <div class="session-info" id="session-text">
-        Connect your Pi account to access VIP reservations, flights, and logistics.
+        Connect your Pi account to access VIP reservations, flights, tours, and logistics.
       </div>
       <div class="button-group">
         <button id="btn-login" class="btn" type="button">Connect with Pi</button>
@@ -37,13 +37,14 @@
     </section>
 
     <div class="search-wrapper">
-      <input type="text" id="search-input" class="search-input" placeholder="Search by city, airline, hotel, or logistics...">
+      <input type="text" id="search-input" class="search-input" placeholder="Search by city, airline, hotel, tours, or logistics...">
     </div>
 
     <nav class="tabs-container">
       <button class="tab-btn active" data-filter="all">All Services</button>
       <button class="tab-btn" data-filter="stays">🏨 Hotels & Resorts</button>
       <button class="tab-btn" data-filter="flights">✈️ Aviation & Flights</button>
+      <button class="tab-btn" data-filter="tours">🗺️ Curated Tours & Safaris</button>
       <button class="tab-btn" data-filter="logistics">🚚 Logistics & VIP Fleet</button>
     </nav>
 
@@ -53,7 +54,7 @@
 
     <section class="partner-section">
       <h2>Partner with SARAVIA Ecosystem</h2>
-      <p>Are you a hotel operator, airline charter, private jet broker, or logistics enterprise? Offer your services to millions of verified Pioneers worldwide.</p>
+      <p>Are you a hotel operator, airline charter, tour company, or logistics enterprise? Offer your services to millions of verified Pioneers worldwide.</p>
       <button class="btn btn-purple" onclick="document.getElementById('partner-modal').style.display='flex'">
         Submit Merchant Listing
       </button>
@@ -72,6 +73,7 @@
           <select id="p-category" class="form-control" required>
             <option value="stays">Hotel / Luxury Stay</option>
             <option value="flights">Aviation / Airline Flight</option>
+            <option value="tours">Curated Tour / Safari</option>
             <option value="logistics">Logistics / VIP Transport</option>
           </select>
         </div>

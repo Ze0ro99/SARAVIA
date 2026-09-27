@@ -21,7 +21,7 @@ function saveReceipt(receipt) {
     localStorage.setItem("saravia_receipts", JSON.stringify(list));
     renderReceipts();
   } catch (e) {
-    console.warn("Storage warning:", e);
+    console.warn("Storage notice:", e);
   }
 }
 
@@ -135,6 +135,7 @@ function onIncompletePayment(payment) {
 }
 
 window.saraviaPay = payWithPi;
+window.saraviaStatus = showToast;
 window.saraviaToast = showToast;
 
 document.addEventListener("DOMContentLoaded", () => {
